@@ -20,6 +20,9 @@ import { ClientCardComponent } from './components/clients/client-card/client-car
 import { UsersapiService } from './services/usersapi.service';
 import { RestapiService } from './services/restapi.service';
 import { AddClientsComponent } from './components/add-clients/add-clients.component';
+import { AddProjectsComponent } from './components/add-projects/add-projects.component';
+import { ProjectsComponent } from './components/projects/projects.component';
+import { ProjectCardComponent } from './components/projects/project-card/project-card.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +34,10 @@ import { AddClientsComponent } from './components/add-clients/add-clients.compon
     SignupComponent,
     ClientsComponent,
     ClientCardComponent,
-    AddClientsComponent
+    AddClientsComponent,
+    AddProjectsComponent,
+    ProjectsComponent,
+    ProjectCardComponent
   ],
   imports: [
     BrowserModule,

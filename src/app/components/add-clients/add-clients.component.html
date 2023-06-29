@@ -17,7 +17,10 @@
                             <div class="col mb-3">
                                 <label class="btn btn-default shadow w-100">
                                     Logo <input type="file" hidden
-                                        onchange="$('#upload-logo-info').text(this.files[0].name)">
+                                        onchange="$('#upload-logo-info').text(this.files[0].name)"
+                                        #logo accept='image/**'
+                                        formControlName="logoPath"
+                                        (change)="handleImageUpload(logo.files)">
                                 </label>
                                 <span class='label label-info' id="upload-logo-info"></span>
                             </div>
@@ -28,8 +31,7 @@
                                         onchange="$('#upload-agreement-info').text(this.files[0].name)"
                                         #agreement accept='application/pdf'
                                         formControlName="agreementPath"
-                                        (change)="handleFileUpload(agreement.files)"
-                                        required>
+                                        (change)="handleFileUpload(agreement.files)">
                                 </label>
                                 <span class='label label-info' id="upload-agreement-info"></span>
                             </div>

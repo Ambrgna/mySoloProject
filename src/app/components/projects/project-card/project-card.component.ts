@@ -1,22 +1,21 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { Client } from 'src/app/entities/client';
+import { Project } from 'src/app/entities/project';
 import { RestapiService } from 'src/app/services/restapi.service';
 
 @Component({
-  selector: 'app-client-card',
-  templateUrl: './client-card.component.html',
-  styleUrls: ['./client-card.component.css']
+  selector: 'app-project-card',
+  templateUrl: './project-card.component.html',
+  styleUrls: ['./project-card.component.css']
 })
-export class ClientCardComponent implements OnInit {
-  @Input() client!: Client;
+export class ProjectCardComponent {
+  @Input() project!: Project;
   userid!: number;
-  isOwner:boolean=false;
+  @Input() isOwner:boolean=false;
   logo:string|undefined;
   date:number= Date.now();
-  @Output("updateClients") updateClients: EventEmitter<any> = new EventEmitter();
-
+  @Output("updateProjects") updateProjects: EventEmitter<any> = new EventEmitter();
 
   constructor(private service: RestapiService, private router: Router, public snackBar: MatSnackBar){
     const uid = sessionStorage.getItem("userid");
@@ -24,27 +23,9 @@ export class ClientCardComponent implements OnInit {
       this.userid=parseInt(uid);
     }
   }
-  ngOnInit(): void {
-    if(this.client.name!==undefined){
-      this.logo=this.client.name.split("")[0];
-    }    
-    if(this.client.userId==this.userid){
-      this.isOwner=true;
-      console.log(this.isOwner);
-    }
-
-    // if(this.client.logoPath!=null){
-    //   await fetch("https://rfsp.s3.us-east-2.amazonaws.com/1/logo.jpg", {
-    //   "method": "POST",
-    //   "mode": "no-cors",
-    //   "credentials": "include"
-    // });
-      // await fetch(this.client.logoPath, {method:'POST', credentials:'include'});  
-    // }
-  }
 
   editClient(id : number) {
-    const link = "main/"+id+"/c/edit"
+    const link = "main/"+id+"/p/edit"
     this.router.navigate([link]);
   }
 
@@ -58,7 +39,7 @@ export class ClientCardComponent implements OnInit {
       this.service.deleteClient(id).subscribe({
         next: (response) => {
           console.log(response);
-          this.updateClients.emit();
+          this.updateProjects.emit();
           this.openSnackBar(name+" deleted successfully");
         },
         error: (error) => {

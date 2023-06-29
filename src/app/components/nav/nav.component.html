@@ -7,8 +7,16 @@
                 <li class="nav-item"><a class="nav-link" href="integrations.html">Integrations</a></li>
                 <li class="nav-item"><a class="nav-link" href="pricing.html">Pricing</a></li>
                 <li class="nav-item"><a class="nav-link" href="contacts.html">Contacts</a></li>
-                <li class="nav-item"><a class="nav-link" routerLink="/main/add">Add</a></li>
-            </ul><a class="btn btn-primary shadow" role="button" href="signup.html">Sign up</a>
+                <li class="nav-item"><a class="nav-link" routerLink="/main/1/p/add">Add Project</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/main/c/add">Add</a></li>
+            </ul>
+            <ng-container *ngIf="loggedin">
+                <a class="btn btn-primary shadow" role="button" (click)="logout()">Logout</a>
+            </ng-container>
+            <ng-container *ngIf="!loggedin">
+                <a class="btn btn-primary shadow" role="button" routerLink="/login">Login</a>
+            </ng-container>
+            <!-- <a class="btn btn-primary shadow" role="button" href="signup.html">Sign up</a> -->
         </div>
     </div>
 </nav>

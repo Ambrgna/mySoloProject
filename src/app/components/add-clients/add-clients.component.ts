@@ -29,6 +29,8 @@ export class AddClientsComponent {
   public imagePath: any;
   imgURL: any;
   isImages: boolean = false;
+  savedAgreementPath: string | undefined;
+  savedlogoPath: string | null | undefined;
   
   constructor(private service: RestapiService, public snackBar: MatSnackBar, private route: ActivatedRoute, private router: Router) {
     this.client=new Client();
@@ -80,42 +82,39 @@ export class AddClientsComponent {
 
     this.service.getClientById(this.editid).subscribe({
       next: (response) => {
-        console.log(response);
+      this.client=response;
       this.clientForm.patchValue({
         name: response.name,
         description: response.description,
-        logoPath: response.logoPath,
-        agreementPath: response.agreementPath
+        // logoPath: response.logoPath,
+        // agreementPath: response.agreementPath
       });
-      this.client=this.clientForm.value;
+      this.savedAgreementPath=response.agreementPath;
+      this.savedlogoPath=response.logoPath;
     },
       error: (error) => console.log(error),
     });
   }
   
-  // handleImageUpload(files:any):void{
-  //   var path:any;
-  //   if (files.length === 0){
-  //     return;
-  //   } else {
-  //     this.isImages =true;
-  //   }
+  handleImageUpload(files:any):void{
+    var path:any;
+    if (files.length === 0){
+      return;
+    } else {
+      this.isImages =true;
+    }
  
-  //   var mimeType = files[0].type;
-  //   if (mimeType.match(/image\/*/) == null) {
-  //     this.message = "Only images are supported.";
-  //     return;
-  //   }
+    var mimeType = files[0].type;
+    if (mimeType.match(/image\/*/) == null) {
+      // this.message = "Only images are supported.";
+      return;
+    }
  
-  //   var reader = new FileReader();
-  //   this.imagePath = files[0];
+    var reader = new FileReader();
+    this.imagePath = files[0];
     
-  //   reader.readAsDataURL(files[0]); 
-  //   reader.onload = (_event) => { 
-  //     this.previewImg = reader.result;
-  //     this.client.logoPath = reader.result;
-  //   }
-  // }
+    reader.readAsDataURL(files[0]); 
+  }
 
   handleFileUpload(files:any):void{
     if (files.length === 0){
@@ -135,55 +134,55 @@ export class AddClientsComponent {
     console.log(this.clientForm.value.agreementPath);
 
   }
-  // upload(filePath:any,itemId:any,date:number, ext:string){
-  //   const file = new FormData(); 
-  //   var name: string;
-  //   if (ext=="jpg"){
-  //     name=itemId+"/"+date+"."+ext;
-  //   } else {
-  //     name=itemId+"/client."+ext;
-  //   }
+  upload(filePath:any,itemId:any,date:number,ext:string){
+    const file = new FormData(); 
+    var name: string;
+    if (ext=="jpg"){
+      name=itemId+"/logo."+ext;
+    } else {
+      name=itemId+"/client."+ext;
+    }
     
-  //   console.log(name);
-  //   file.append('file', filePath, name);
+    console.log(name);
+    file.append('file', filePath, name);
     
-  //   this.clientForm.patchValue({
-  //     path: this.bucketUrl+name
-  //   });
+    this.clientForm.patchValue({
+      path: this.bucketUrl+name
+    });
 
-  //   this.service.postFile(file,ext).subscribe({
-  //     next: (response) => 
-  //   console.log("Uploaded "+name+" Successfully."),
-  //     error: (error) => 
-  //     console.log("Uploaded "+name+" Failed."),
-  //   });
-  // }
+    this.service.postFile(file,ext).subscribe({
+      next: (response) => 
+    console.log("Uploaded "+name+" Successfully."),
+      error: (error) => 
+      console.log("Uploaded "+name+" Failed."),
+    });
+  }
   onSubmit() { 
-    // const defaultImg:string="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
-    // var itemId;
-    // const date =getInt();
-    // itemId=(this.routeid!=null) ? this.routeid : getInt();
-    // itemId=getInt();
+    const defaultImg:string="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
+    var itemId;
+    const date =getDate();
+    itemId=(this.routeid!=null) ? this.routeid : getDate();
+    // itemId=getDate();
     
     this.client=this.clientForm.value;
 
-    // if(this.isImages){
-    //   this.upload(this.imagePath,itemId,date,"jpg");
-    //   this.client.imgPath=this.bucketUrl+itemId+"/"+date+".jpg"
-    //   console.log(this.client);
-    // }else if(this.previewImg!==undefined){
-    //   this.client.imgPath=this.previewImg;
-    // } else {
-    //   this.client.imgPath=defaultImg}
-    // if(this.isFiles){
-    //   this.upload(this.clientForm.value.filePath,itemId,date,"pdf");
-    // }
-    // this.client.agreementPath=this.bucketUrl+itemId+"/client.pdf"
-    this.clientForm.value.agreementPath="";
+    if(this.isImages){
+      this.upload(this.imagePath,itemId,date,"jpg");
+      this.savedlogoPath=this.bucketUrl+itemId+"/logo.jpg";
+      console.log(this.client);
+    }
+
+    if(this.isFiles){
+      this.upload(this.clientForm.value.agreementPath,itemId,date,"pdf");
+      this.savedAgreementPath=this.bucketUrl+itemId+"/client.pdf";
+    }
+    // this.clientForm.value.agreementPath="";
     if(this.routeid!==null){
       this.client.clientId = parseInt(this.routeid);
     }
     this.client.userId=parseInt(this.userid);
+    this.client.agreementPath=this.savedAgreementPath;
+    this.client.logoPath=this.savedlogoPath;
     console.log(this.client);
     
       if(this.editing){ 
@@ -219,6 +218,6 @@ export class AddClientsComponent {
   }
 
 } 
-function getInt() {
+function getDate() {
   return Date.now();
 }
