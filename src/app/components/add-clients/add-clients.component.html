@@ -1,0 +1,52 @@
+<section class="py-5 mt-5">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-8 col-xl-6 text-center mx-auto">
+                <h2 *ngIf="!editing" class="display-6 fw-bold mb-4">Add <span class="underline">Client</span></h2>
+                <h2 *ngIf="editing" class="display-6 fw-bold mb-4">Edit <span class="underline">{{client.name}}</span></h2>
+            </div>
+        </div>
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-6">
+                <div>
+                    <form class="p-3 p-xl-4" method="post" [formGroup]="clientForm" (ngSubmit)="onSubmit()" data-bs-theme="light">
+                        <div class="mb-3"><input id="name" class="shadow form-control" type="text" name="name" placeholder="Name" formControlName="name" required/></div>
+                        <div class="mb-3"></div>
+                        <div class="mb-3"><textarea id="description" class="shadow form-control" name="description" rows="6" placeholder="Description" formControlName="description" maxlength="250"></textarea></div>
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label class="btn btn-default shadow w-100">
+                                    Logo <input type="file" hidden
+                                        onchange="$('#upload-logo-info').text(this.files[0].name)">
+                                </label>
+                                <span class='label label-info' id="upload-logo-info"></span>
+                            </div>
+                            <div class="col mb-3">
+                                <label class="btn btn-default shadow w-100">
+                                    Signed Agreement 
+                                    <input type="file" hidden    
+                                        onchange="$('#upload-agreement-info').text(this.files[0].name)"
+                                        #agreement accept='application/pdf'
+                                        formControlName="agreementPath"
+                                        (change)="handleFileUpload(agreement.files)"
+                                        required>
+                                </label>
+                                <span class='label label-info' id="upload-agreement-info"></span>
+                            </div>
+                        </div>    
+                        <div *ngIf="clientForm.invalid && name.touched" class="alert alert-danger">
+                        
+                            <div *ngIf="name.errors?.['required']&&name.touched">
+                                Name is required.
+                            </div>
+                            <div *ngIf="this.clientForm.value.agreementPath==null">
+                                Signed Agreement is required.
+                            </div>
+                        </div>
+                        <div><button class="btn btn-primary shadow d-block w-100" type="submit" [disabled]="clientForm.invalid">{{action}}</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

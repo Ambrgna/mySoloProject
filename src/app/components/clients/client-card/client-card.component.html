@@ -1,13 +1,26 @@
-<div class="card border-light border-1 d-flex justify-content-center p-4">
-    <div class="card-body">
-        <div class="d-flex flex-shrink-0 justify-content-center align-items-center bs-icon-lg bs-icon-rounded bs-icon-secondary d-inline-block mb-4 bs-icon"><svg class="icon icon-tabler icon-tabler-school" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-    <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6"></path>
-    <path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4"></path>
-</svg></div>
+<div class="card h-100 border-light border-1">
+    <div class="d-flex flex-column align-items-start card-body">
+        <div *ngIf="client.logoPath==null" class="d-flex flex-shrink-0 justify-content-center align-items-center bs-icon-lg bs-icon-rounded bs-icon-secondary d-inline-block mb-4 bs-icon">
+            <strong>{{logo}}</strong>
+            <!-- <svg class="icon icon-tabler icon-tabler-school" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M22 9l-10 -4l-10 4l10 4l10 -4v6"></path>
+                <path d="M6 10.6v5.4a6 3 0 0 0 12 0v-5.4"></path>
+            </svg> -->
+        </div>
+        <div *ngIf="client.logoPath!=null" class="bs-icon-xl d-inline-block mb-4 bs-icon">
+            <img class="logo" src="{{client.logoPath}}"/>
+        </div>
         <div>
             <h4 class="fw-bold">{{client.name}}</h4>
-            <p class="text-muted">About client</p><button class="btn btn-sm px-0" type="button">View Projects&nbsp;<svg class="bi bi-arrow-right" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewbox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"></path></svg><br></button>
+            <p class="text-muted">{{client.description}}</p>
+        </div>
+        <button class="btn btn-sm px-0 mt-auto" type="button">View Projects&nbsp;<svg class="bi bi-arrow-right" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewbox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"></path></svg><br></button>
+    </div>
+    <div *ngIf="true" class="card-footer">
+        <div class="row">
+            <div class="col"><button class="btn btn-primary shadow" type="button" (click)="editClient(client.clientId!)">Edit</button></div>
+            <div class="col"><button class="btn btn-danger shadow" type="button" (click)="deleteConfirm(client.name!, client.clientId!)">Delete</button></div>
         </div>
     </div>
 </div>

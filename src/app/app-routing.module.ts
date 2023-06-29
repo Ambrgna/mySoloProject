@@ -4,6 +4,7 @@ import { MainComponent } from './components/main/main.component';
 import { LoginComponent } from './components/login/login.component';
 import { SignupComponent } from './components/signup/signup.component';
 import { ClientsComponent } from './components/clients/clients.component';
+import { AddClientsComponent } from './components/add-clients/add-clients.component';
 
 const routes: Routes = [
   {path: '' , redirectTo: 'main/clients', pathMatch: 'full'},
@@ -16,6 +17,14 @@ const routes: Routes = [
       {
         path: 'clients',
         component: ClientsComponent,
+      },
+      {
+        path: 'add',
+        component: AddClientsComponent,
+      },
+      {
+        path: 'main/:id/c/edit',
+        component: AddClientsComponent,
       }
     ],
   }

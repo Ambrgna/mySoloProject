@@ -19,6 +19,7 @@ import { ClientCardComponent } from './components/clients/client-card/client-car
 
 import { UsersapiService } from './services/usersapi.service';
 import { RestapiService } from './services/restapi.service';
+import { AddClientsComponent } from './components/add-clients/add-clients.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { RestapiService } from './services/restapi.service';
     LoginComponent,
     SignupComponent,
     ClientsComponent,
-    ClientCardComponent
+    ClientCardComponent,
+    AddClientsComponent
   ],
   imports: [
     BrowserModule,
