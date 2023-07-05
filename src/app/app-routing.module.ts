@@ -33,7 +33,7 @@ const routes: Routes = [
         component: AddProjectsComponent,
       },
       {
-        path: ':clientid/p/edit',
+        path: ':clientid/:projectid/p/edit',
         component: AddProjectsComponent,
       },
       {

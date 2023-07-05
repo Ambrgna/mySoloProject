@@ -1,4 +1,4 @@
-<div class="card h-100 border-light border-1">
+<div class="card w-100 h-100 border-light border-1">
     <div class="d-flex flex-column align-items-start card-body">
         <div *ngIf="client.logoPath==null" class="d-flex flex-shrink-0 justify-content-center align-items-center bs-icon-lg bs-icon-rounded bs-icon-secondary d-inline-block mb-4 bs-icon">
             <strong>{{logo}}</strong>
@@ -19,8 +19,8 @@
     </div>
     <div *ngIf="isOwner" class="card-footer">
         <div class="row">
-            <div class="col"><button class="btn btn-primary shadow" type="button" (click)="editClient(client.clientId!)">Edit</button></div>
-            <div class="col"><button class="btn btn-danger shadow" type="button" (click)="deleteConfirm(client.name!, client.clientId!)">Delete</button></div>
+            <div class="col p-2 text-center"><button class="btn btn-primary shadow w-100" type="button" (click)="editClient(client.clientId!)">Edit</button></div>
+            <div class="col p-2 text-center"><button class="btn btn-danger shadow w-100" type="button" (click)="deleteConfirm(client.name!, client.clientId!)">Delete</button></div>
         </div>
     </div>
 </div>

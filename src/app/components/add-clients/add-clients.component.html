@@ -13,6 +13,40 @@
                         <div class="mb-3"><input id="name" class="shadow form-control" type="text" name="name" placeholder="Name" formControlName="name" required/></div>
                         <div class="mb-3"></div>
                         <div class="mb-3"><textarea id="description" class="shadow form-control" name="description" rows="6" placeholder="Description" formControlName="description" maxlength="250"></textarea></div>
+
+                        <div class="row">
+                            <div class="col">
+                                <label class="form-label" for="visibility">Visibility</label>
+                                <mat-radio-group class="row mb-3"  formControlName="visibility" name="visibility" aria-label="Select an option" required>
+                                    <mat-radio-button class="col" #visibilityTrue [value]="true" (change)="visibilityChange(visibilityTrue.value)">Public</mat-radio-button>
+                                    <mat-radio-button class="col" #visibilityFalse [value]="false" (change)="visibilityChange(visibilityFalse.value)">Private</mat-radio-button>
+                                </mat-radio-group>
+                            </div>
+                            <div *ngIf="this.clientForm.value.visibility==false" class="col">
+                                <div class="mb-3">
+                                    <label class="form-label" for="users">Visible to: </label>
+                                    <mat-select multiple id="users" formControlName="canView" class="shadow form-control" placeholder="Users" >
+                                        <mat-option 
+                                            [value]="userid"
+                                            disabled
+                                            selected
+                                            >{{username}} (Me)
+                                        </mat-option>
+                                        <mat-option 
+                                            *ngIf="users.length==0"
+                                            value=""
+                                            disabled
+                                            >No Users Accounts
+                                        </mat-option>
+                                        <mat-option 
+                                            *ngFor="let user of users"
+                                            [value]="user.userId"
+                                            >{{user.username}}
+                                        </mat-option>
+                                    </mat-select>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col mb-3">
                                 <label class="btn btn-default shadow w-100">
@@ -40,6 +74,12 @@
                         
                             <div *ngIf="name.errors?.['required']&&name.touched">
                                 Name is required.
+                            </div>
+                            <div *ngIf="v.errors?.['required']">
+                                Visibility is required.
+                            </div>
+                            <div *ngIf="canView.errors?.['required']">
+                                User is required.
                             </div>
                             <div *ngIf="this.clientForm.value.agreementPath==null">
                                 Signed Agreement is required.

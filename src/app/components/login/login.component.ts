@@ -34,7 +34,7 @@ export class LoginComponent {
       next: async () => {
         var userid = await this.service.userid(this.loginForm.value.username);
 
-        sessionStorage.setItem("userid", userid);
+        localStorage.setItem("userid", userid);
 
         this.router.navigate(["/main"]);
       },

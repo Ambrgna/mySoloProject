@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Client } from 'src/app/entities/client';
+import { User } from 'src/app/entities/user';
 import { RestapiService } from 'src/app/services/restapi.service';
 
 @Component({
@@ -14,8 +15,6 @@ export class AddClientsComponent {
   bucketUrl: string = "https://rfsp.s3.us-east-2.amazonaws.com/";
 
   client!: Client;
-  
-  control = new FormControl();
 
   editing: boolean = false;
   editid:any;
@@ -23,6 +22,8 @@ export class AddClientsComponent {
   routeid:string|null;
   action:string="Add";
   isFiles: boolean = false;
+  users: User[] = [];
+  username:string|undefined = "";
 
   clientForm!: FormGroup;
   
@@ -36,23 +37,25 @@ export class AddClientsComponent {
     this.client=new Client();
     this.routeid = this.route.snapshot.paramMap.get('clientid');
     
-    const headers = sessionStorage.getItem("headers");
-    this.userid = sessionStorage.getItem("userid");
+    const headers = localStorage.getItem("headers");
+    this.userid = localStorage.getItem("userid");
+    this.userid=parseInt(this.userid)
     
     if(headers == null){
       this.router.navigate(["/login"]);
     }
 
+    this.getUsers();
+
     this.clientForm = new FormGroup({
-      name: new FormControl(this.client?.name, [
-        Validators.required
-      ]),
+      name: new FormControl(this.client?.name, [Validators.required]),
       description: new FormControl(this.client?.description),
-      imgPath: new FormControl(this.client?.logoPath),
-      agreementPath: new FormControl(this.client?.agreementPath, [
-        Validators.required
-      ]),
+      visibility: new FormControl(this.client?.visibility, [Validators.required]),
+      canView: new FormControl(this.client?.canView, [Validators.required]),
+      logoPath: new FormControl(this.client?.logoPath),
+      agreementPath: new FormControl(this.client?.agreementPath, [Validators.required]),
     });
+    
     this.editid = this.route.snapshot.paramMap.get('clientid');
     console.log(this.editid);
     
@@ -62,12 +65,29 @@ export class AddClientsComponent {
     }
     
   }
+  getUsers(): void {
+    this.service.getUsers().subscribe({
+      next: (response: User[]) => {
+        for(const user of response)
+        {
+          if(user.userId!=this.userid){
+            this.users.push(user);
+          } else {
+            this.username=user.username;
+          }
+        }
+        console.log(this.users);
+      },
+    });
+  }
 
   get name(): any { return this.clientForm.get('name');}
   get description(): any { return this.clientForm.get('description');}
+  get v(): any { return this.clientForm.get('visibility');}
+  get canView(): any { return this.clientForm.get('canView');}
   get logoPath(): any { return this.clientForm.get('logoPath');}
   get agreementPath(): any { return this.clientForm.get('agreementPath');}
-  
+
   edit():void{
     this.action = "Edit";
 
@@ -76,6 +96,8 @@ export class AddClientsComponent {
         Validators.required
       ]),
       description: new FormControl(this.client?.description),
+      visibility: new FormControl(this.client?.visibility, [Validators.required]),
+      canView: new FormControl(this.client?.canView, [Validators.required]),
       logoPath: new FormControl(this.client?.logoPath),
       agreementPath: new FormControl(this.client?.agreementPath),
     });
@@ -85,9 +107,9 @@ export class AddClientsComponent {
       this.client=response;
       this.clientForm.patchValue({
         name: response.name,
-        description: response.description,
-        // logoPath: response.logoPath,
-        // agreementPath: response.agreementPath
+        visibility: response.visibility,
+        canView: response.canView,
+        description: response.description
       });
       this.savedAgreementPath=response.agreementPath;
       this.savedlogoPath=response.logoPath;
@@ -95,7 +117,26 @@ export class AddClientsComponent {
       error: (error) => console.log(error),
     });
   }
-  
+  visibilityChange(value: boolean):void{
+    var usersView:number[]=[];
+    if(value){
+      usersView=[-1];
+      // usersView.push(this.userid);
+      // for(const user of this.users)
+      // {
+      //   if(user.userId!==undefined){
+      //     usersView.push(user.userId);
+      //   }
+      // }
+
+    }else{
+      usersView=[this.userid];
+    }
+    this.clientForm.patchValue({
+      canView: usersView
+    });
+    console.log(this.clientForm.value.canView);
+  }
   handleImageUpload(files:any):void{
     var path:any;
     if (files.length === 0){
@@ -158,6 +199,7 @@ export class AddClientsComponent {
     });
   }
   onSubmit() { 
+    console.log(this.clientForm.value);
     const defaultImg:string="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
     var itemId;
     const date =getDate();
@@ -180,7 +222,7 @@ export class AddClientsComponent {
     if(this.routeid!==null){
       this.client.clientId = parseInt(this.routeid);
     }
-    this.client.userId=parseInt(this.userid);
+    this.client.userId=this.userid;
     this.client.agreementPath=this.savedAgreementPath;
     this.client.logoPath=this.savedlogoPath;
     console.log(this.client);

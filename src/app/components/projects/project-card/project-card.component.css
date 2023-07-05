@@ -1,0 +1,18 @@
+ul {
+    padding: 0;
+    list-style-type: none;
+  }
+  .team-member {
+    display: inline-block;
+    justify-content: center;
+    margin: 2px;
+}
+.team-member::after {
+  content: "\2022";
+  align-self: center; 
+}
+.team-member:last-child::after {
+  content: "\2022";
+  align-self: center;     
+  visibility: hidden;
+}

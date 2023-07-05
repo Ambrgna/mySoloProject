@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Client } from '../entities/client';
 import { Project } from '../entities/project';
+import { User } from '../entities/user';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,14 @@ export class RestapiService {
     console.log(this.headers);
   }
 
+
+  public getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/users`);
+  }
+  
+  public getUserById(id:string){
+    return this.http.get<User>(`${this.apiUrl}/users/id/${id}`, { headers: this.headers});
+  }
 
   public getClients(): Observable<Client[]> {
     return this.http.get<Client[]>(`${this.apiUrl}/clients`)

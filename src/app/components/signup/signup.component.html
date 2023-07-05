@@ -9,8 +9,8 @@
                     <div class="mb-3"><input class="shadow-sm form-control" type="password" name="password" placeholder="Password" formControlName="password" required (keyup)="checkPassword()"></div>
                     <div class="mb-3"><input class="shadow-sm form-control" type="password" name="password_repeat" placeholder="Repeat Password" formControlName="confirmPassword" required (keyup)="checkPassword()"></div>
                     <mat-radio-group class="row mb-3" formControlName="role" aria-label="Select an option" required>
-                        <mat-radio-button class="col" value="0">Restaurant Owner</mat-radio-button>
-                        <mat-radio-button class="col" value="1">User</mat-radio-button>
+                        <mat-radio-button class="col" value="0">Team Lead</mat-radio-button>
+                        <mat-radio-button class="col" value="1">Team Member</mat-radio-button>
                       </mat-radio-group>
                     <div *ngIf="(u.errors&&u.touched)||(p.errors&&p.touched) || failed ||(!passwordMatch&&cp.touched)||(signupForm.invalid&&u.touched&&p.touched&&cp.touched)" class="alert alert-danger" role="alert">
                         <div *ngIf="u.errors?.['required']&&u.touched">

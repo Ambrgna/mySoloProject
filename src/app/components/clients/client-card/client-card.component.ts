@@ -19,7 +19,7 @@ export class ClientCardComponent implements OnInit {
 
 
   constructor(private service: RestapiService, private router: Router, public snackBar: MatSnackBar){
-    const uid = sessionStorage.getItem("userid");
+    const uid = localStorage.getItem("userid");
     if(uid!=null){
       this.userid=parseInt(uid);
     }

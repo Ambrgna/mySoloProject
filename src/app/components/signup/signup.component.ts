@@ -56,7 +56,7 @@ export class SignupComponent {
   }
 
   addUser(){
-    const roles = ["ROLE_OWNER","ROLE_USER"];
+    const roles = ["ROLE_LEAD","ROLE_MEMBER"];
     this.signupForm.value.role= roles[parseInt(this.signupForm.value.role)];
     
     this.service.addUser(this.signupForm.value).subscribe({
