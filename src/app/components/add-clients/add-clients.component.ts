@@ -233,7 +233,7 @@ export class AddClientsComponent {
         this.service.updateClient(this.client).subscribe({
           next: (response) => {
             this.openSnackBar("Client edit successfully");
-            this.router.navigate(["/main/clients"]);
+            this.router.navigate(["/main/"+this.userid+"/clients"]);
         },
           error: (error) => this.openSnackBar("Client edit failed"),
         });
@@ -243,7 +243,7 @@ export class AddClientsComponent {
           { 
             console.log(response);
             this.openSnackBar("Client posted successfully");
-            this.router.navigate(["/main/clients"]);
+            this.router.navigate(["/main/"+this.userid+"/clients"]);
           },
           error: (error) => {
             console.log(error);

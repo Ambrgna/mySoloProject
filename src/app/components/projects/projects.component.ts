@@ -17,16 +17,15 @@ export class ProjectsComponent implements OnInit {
   projects: Project[] = [];
   routeid:string|null;
   isOwner:boolean = false;
-  userid:number | undefined;
+  canView:boolean = false;
+  userid:number;
  
   constructor(private service: RestapiService, private route:ActivatedRoute,private sanitizer: DomSanitizer){
     this.routeid = this.route.snapshot.paramMap.get('clientid');
     this.getProjects(this.routeid);
     this.getClient(this.routeid);
     const uid = localStorage.getItem("userid");
-    if(uid!=null){
-      this.userid=parseInt(uid);
-    }
+    this.userid=(uid!=null) ? parseInt(uid):-1;
   }
   ngOnInit(): void {} 
   
@@ -34,6 +33,10 @@ export class ProjectsComponent implements OnInit {
     this.service.getClientById(id).subscribe({
       next: (response: Client) => {
         console.log(response);
+        this.canView = (
+          response.visibility||response.canView?.includes(this.userid)
+          )?true:false;
+        console.log("canView",this.canView);
         this.client=response;
         if(response.userId==this.userid){
           this.isOwner=true;

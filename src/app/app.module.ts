@@ -23,6 +23,8 @@ import { AddClientsComponent } from './components/add-clients/add-clients.compon
 import { AddProjectsComponent } from './components/add-projects/add-projects.component';
 import { ProjectsComponent } from './components/projects/projects.component';
 import { ProjectCardComponent } from './components/projects/project-card/project-card.component';
+import { MyProjectsComponent } from './components/projects/my-projects/my-projects.component';
+import { ClientComponent } from './components/projects/my-projects/client/client.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +39,9 @@ import { ProjectCardComponent } from './components/projects/project-card/project
     AddClientsComponent,
     AddProjectsComponent,
     ProjectsComponent,
-    ProjectCardComponent
+    ProjectCardComponent,
+    MyProjectsComponent,
+    ClientComponent
   ],
   imports: [
     BrowserModule,

@@ -30,17 +30,7 @@ export class ClientCardComponent implements OnInit {
     }    
     if(this.client.userId==this.userid){
       this.isOwner=true;
-      console.log(this.isOwner);
     }
-
-    // if(this.client.logoPath!=null){
-    //   await fetch("https://rfsp.s3.us-east-2.amazonaws.com/1/logo.jpg", {
-    //   "method": "POST",
-    //   "mode": "no-cors",
-    //   "credentials": "include"
-    // });
-      // await fetch(this.client.logoPath, {method:'POST', credentials:'include'});  
-    // }
   }
 
   editClient(id : number) {

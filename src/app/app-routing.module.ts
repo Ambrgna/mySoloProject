@@ -7,6 +7,7 @@ import { ClientsComponent } from './components/clients/clients.component';
 import { AddClientsComponent } from './components/add-clients/add-clients.component';
 import { AddProjectsComponent } from './components/add-projects/add-projects.component';
 import { ProjectsComponent } from './components/projects/projects.component';
+import { MyProjectsComponent } from './components/projects/my-projects/my-projects.component';
 
 const routes: Routes = [
   {path: '' , redirectTo: 'main/clients', pathMatch: 'full'},
@@ -18,6 +19,10 @@ const routes: Routes = [
     children: [
       {
         path: 'clients',
+        component: ClientsComponent,
+      },
+      {
+        path: ':userid/clients',
         component: ClientsComponent,
       },
       {
@@ -35,6 +40,14 @@ const routes: Routes = [
       {
         path: ':clientid/:projectid/p/edit',
         component: AddProjectsComponent,
+      },
+      // {
+      //   path: ':userid/myprojects',
+      //   component: MyProjectsComponent,
+      // },
+      {
+        path: 'myprojects',
+        component: MyProjectsComponent,
       },
       {
         path: ':clientid/projects',
