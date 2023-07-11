@@ -1,4 +1,4 @@
-<section class="py-5 mt-5">
+<section *ngIf="hasAccess" class="py-5 mt-5">
     <div class="container py-5">
         <div class="row">
             <div class="col-md-8 col-xl-6 text-center mx-auto">
@@ -88,6 +88,17 @@
                         <div><button class="btn btn-primary shadow d-block w-100" type="submit" [disabled]="clientForm.invalid">{{action}}</button></div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section *ngIf="!hasAccess" class="py-5 mt-5">
+    <div class="container">
+        <div class="row row-cols-1 d-flex justify-content-center align-items-center">
+            <div class="col-md-10 text-center"><img class="img-fluid w-100" src="assets/img/illustrations/404.svg" /></div>
+            <div class="col text-center">
+                <h2 class="display-3 fw-bold mb-4">Page Not Found</h2>
+                <p class="fs-4 text-muted">Fusce adipiscing sit, torquent porta pulvinar.</p>
             </div>
         </div>
     </div>

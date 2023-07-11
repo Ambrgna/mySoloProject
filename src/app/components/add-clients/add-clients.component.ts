@@ -15,6 +15,7 @@ export class AddClientsComponent {
   bucketUrl: string = "https://rfsp.s3.us-east-2.amazonaws.com/";
 
   client!: Client;
+  hasAccess:boolean = false;
 
   editing: boolean = false;
   editid:any;
@@ -28,6 +29,7 @@ export class AddClientsComponent {
   clientForm!: FormGroup;
   
   public imagePath: any;
+  public filePath: any;
   imgURL: any;
   isImages: boolean = false;
   savedAgreementPath: string | undefined;
@@ -62,6 +64,8 @@ export class AddClientsComponent {
     if(this.editid!==undefined&&this.editid!==null){
       this.editing =true;
       this.edit();
+    } else {
+      this.hasAccess=true
     }
     
   }
@@ -104,15 +108,18 @@ export class AddClientsComponent {
 
     this.service.getClientById(this.editid).subscribe({
       next: (response) => {
-      this.client=response;
-      this.clientForm.patchValue({
-        name: response.name,
-        visibility: response.visibility,
-        canView: response.canView,
-        description: response.description
-      });
-      this.savedAgreementPath=response.agreementPath;
-      this.savedlogoPath=response.logoPath;
+      if(response.userId==this.userid){
+        this.hasAccess=true;
+        this.client=response;
+        this.clientForm.patchValue({
+          name: response.name,
+          visibility: response.visibility,
+          canView: response.canView,
+          description: response.description
+        });
+        this.savedAgreementPath=response.agreementPath;
+        this.savedlogoPath=response.logoPath;
+      }
     },
       error: (error) => console.log(error),
     });
@@ -171,7 +178,7 @@ export class AddClientsComponent {
     }
 
     var reader = new FileReader();
-    this.clientForm.value.agreementPath = files[0];
+    this.filePath = files[0];
     console.log(this.clientForm.value.agreementPath);
 
   }
@@ -209,13 +216,16 @@ export class AddClientsComponent {
     this.client=this.clientForm.value;
 
     if(this.isImages){
+      console.log(this.imagePath);
       this.upload(this.imagePath,itemId,date,"jpg");
       this.savedlogoPath=this.bucketUrl+itemId+"/logo.jpg";
       console.log(this.client);
     }
 
     if(this.isFiles){
-      this.upload(this.clientForm.value.agreementPath,itemId,date,"pdf");
+      console.log(this.filePath);
+      
+      this.upload(this.filePath,itemId,date,"pdf");
       this.savedAgreementPath=this.bucketUrl+itemId+"/client.pdf";
     }
     // this.clientForm.value.agreementPath="";

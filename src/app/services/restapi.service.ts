@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Client } from '../entities/client';
@@ -11,16 +11,19 @@ import { User } from '../entities/user';
 export class RestapiService {
   apiUrl: string = "http://localhost:9080";
   headers:any;
-  constructor(private http: HttpClient) { }  
+  constructor(private http: HttpClient) { 
+    this.headers = new HttpHeaders({Authorization: 'Basic '+localStorage.getItem("headers")});
+    console.log("headers",this.headers);
+  }  
   
   public getHeader(headers:HttpHeaders): void {
     this.headers=headers;
-    console.log(this.headers);
+    console.log("headers",this.headers);
   }
 
   public removeHeader(): void {
     this.headers = new HttpHeaders();
-    console.log(this.headers);
+    console.log("headers",this.headers);
   }
 
 
@@ -49,6 +52,8 @@ export class RestapiService {
   }
 
   public updateClient(client: Client) {
+    console.log("headers",this.headers);
+    
     return this.http.put(`${this.apiUrl}/clients`, client, { headers: this.headers});
   }
 

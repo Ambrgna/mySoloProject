@@ -27,19 +27,19 @@ const routes: Routes = [
       },
       {
         path: 'c/add',
-        component: AddClientsComponent,
+        component: AddClientsComponent
       },
       {
         path: ':clientid/c/edit',
-        component: AddClientsComponent,
+        component: AddClientsComponent
       },
       {
         path: ':clientid/p/add',
-        component: AddProjectsComponent,
+        component: AddProjectsComponent
       },
       {
         path: ':clientid/:projectid/p/edit',
-        component: AddProjectsComponent,
+        component: AddProjectsComponent
       },
       // {
       //   path: ':userid/myprojects',

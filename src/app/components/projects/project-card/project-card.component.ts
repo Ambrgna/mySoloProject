@@ -16,6 +16,7 @@ export class ProjectCardComponent implements OnInit {
   leads:string[] = [];
   members:string[] = [];
   @Input() isOwner:boolean=false;
+  canEdit:boolean=false;
   logo:string|undefined;
   date:number= Date.now();
   @Output("updateProjects") updateProjects: EventEmitter<any> = new EventEmitter();
@@ -28,7 +29,15 @@ export class ProjectCardComponent implements OnInit {
   }
   ngOnInit(): void {
     console.log(this.project);
+    if(this.project.name!==undefined){
+      this.logo=this.project.name.toUpperCase().split("")[0];
+    }    
     this.getUsers(this.project.teamLeads,this.project.teamMembers);
+    if(this.project.teamLeads!==undefined){
+      this.canEdit=(this.project.teamLeads.includes(this.userid));
+      console.log("canEdit",this.canEdit);
+      
+    }
   }
 
   getUsers(l_ids:any,m_ids:any): void {
@@ -66,7 +75,7 @@ export class ProjectCardComponent implements OnInit {
   public deleteConfirm(name : string, id : number) {
     if(confirm("Are you sure you want to delete " + name))
     {
-      this.service.deleteClient(id).subscribe({
+      this.service.deleteProject(id).subscribe({
         next: (response) => {
           console.log(response);
           this.updateProjects.emit();

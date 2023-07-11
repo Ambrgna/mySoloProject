@@ -15,12 +15,17 @@
                             <div class="col">
                                 <div class="mb-3">
                                     <label class="form-label" for="leads">Team Leads</label>
-                                    <mat-select multiple id="leads" formControlName="teamLeads" class="shadow form-control" placeholder="Leads" required>
+                                    <mat-select multiple id="leads" formControlName="teamLeads" class="shadow form-control" placeholder="Leads" required [disabled]="!isOwner">
                                         <mat-option 
                                             *ngIf="leads.length==0"
                                             value=""
                                             disabled
                                             >No Team Leads Accounts
+                                        </mat-option>
+                                        <mat-option *ngIf="owner!==undefined"
+                                            [value]="owner.userId"
+                                            disabled
+                                            >{{owner.username}} (Owner)
                                         </mat-option>
                                         <mat-option 
                                             *ngFor="let user of leads"
@@ -33,7 +38,7 @@
                             <div class="col">
                                 <div class="mb-3">
                                     <label class="form-label" for="members">Team Members</label>
-                                    <mat-select multiple id="members" formControlName="teamMembers" class="shadow form-control" placeholder="Members">
+                                    <mat-select multiple id="members" formControlName="teamMembers" class="shadow form-control" placeholder="Members" [disabled]="true">
                                         <mat-option 
                                             *ngIf="members.length==0"
                                             value=""

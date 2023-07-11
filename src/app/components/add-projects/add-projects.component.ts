@@ -6,6 +6,7 @@ import { Client } from 'src/app/entities/client';
 import { Project } from 'src/app/entities/project';
 import { User } from 'src/app/entities/user';
 import { RestapiService } from 'src/app/services/restapi.service';
+import { UsersapiService } from 'src/app/services/usersapi.service';
 
 @Component({
   selector: 'app-add-projects',
@@ -17,6 +18,11 @@ export class AddProjectsComponent {
   client!: Client;
   leads: User[] = [];
   members: User[] = [];
+  hasAccess:boolean = false;
+
+  owner!:User;
+
+  isOwner:boolean=false;
 
   project: Project=new Project();
 
@@ -28,7 +34,11 @@ export class AddProjectsComponent {
 
   projectForm!: FormGroup;
 
-  constructor(private service: RestapiService, public snackBar: MatSnackBar, private route: ActivatedRoute, private router: Router) {
+  constructor(private userService: UsersapiService,private service: RestapiService, public snackBar: MatSnackBar, private route: ActivatedRoute, private router: Router) {
+    const uid = localStorage.getItem("userid");
+    if(uid!=null){
+      this.userid=parseInt(uid);
+    }
     this.project=new Project();    
     this.client=new Client();
     
@@ -48,7 +58,8 @@ export class AddProjectsComponent {
       name: new FormControl(this.project?.name, [
         Validators.required
       ]),
-      teamLeads: new FormControl(this.project?.teamLeads, [
+      owner: new FormControl(this.project?.owner),
+      teamLeads: new FormControl({value: this.project?.teamLeads, disabled: true}, [
         Validators.required
       ]),
       teamMembers: new FormControl(this.project?.teamMembers),
@@ -61,6 +72,8 @@ export class AddProjectsComponent {
       this.editing =true;
       this.edit();
     }else{
+      this.isOwner=true;
+      this.projectForm.controls['teamLeads'].enable();
       this.project=this.projectForm.value;
     }
   }
@@ -78,22 +91,44 @@ export class AddProjectsComponent {
     });
   }
   
-  getUsers(): void {
+  getUsers(): void {          
+    this.leads = [];
+    this.members =[];
     this.service.getUsers().subscribe({
       next: (response: User[]) => {
         for(const user of response)
         {
-          
-          if(user.role == "ROLE_LEAD"){
-            this.leads.push(user);
+          if(this.isOwner){
+            console.log("test");
+            if(user.userId==this.userid){
+              
+              this.owner=user;
+            }
+            if(user.role == "ROLE_LEAD"&&user.userId!=this.userid){
+              this.leads.push(user);
+            } else if(user.role != "ROLE_LEAD") {
+              this.members.push(user);
+            }
           } else {
-            this.members.push(user);
+            if(user.role == "ROLE_LEAD"){
+              this.leads.push(user);
+            } else {
+              this.members.push(user);
+            }
           }
         }
         console.log(this.leads);
         console.log(this.members);
+        if(this.isOwner&&!this.editing){          
+          this.projectForm.patchValue({
+            owner:this.owner.userId,
+            teamLeads:[this.owner.userId]
+          });
+          console.log("value",this.projectForm.value);
+        }
       },
     });
+    
   }
 
   edit():void{    
@@ -101,22 +136,37 @@ export class AddProjectsComponent {
 
     this.service.getProjectById(this.editid).subscribe({
       next: (response) => {
-        console.log(response);
-      this.projectForm.patchValue({
-        name: response.name,
-        teamLeads: response.teamLeads,
-        teamMembers: response.teamMembers,
-        description: response.description,
+        if(response.teamLeads?.includes(this.userid)||response.owner==this.userid){
+          this.getUsers();
+          this.hasAccess=true;
+          console.log(this.hasAccess);
+          console.log(response);
+          this.projectForm.patchValue({
+            name: response.name,
+            owner: response.owner,
+            teamLeads: response.teamLeads,
+            teamMembers: response.teamMembers,
+            description: response.description,
+          });
+          this.project=this.projectForm.value;
+          console.log("teamLeads",response.teamLeads);
+          if(this.project.owner==this.userid){
+            this.isOwner=true;
+            this.projectForm.controls['teamLeads'].enable();
+          }
+          console.log("isOwner",this.isOwner);
+          
+        } 
+      },
+        error: (error) => console.log(error),
       });
-      this.project=this.projectForm.value;
-      console.log(this.projectForm.value.teamMembers);
-    },
-      error: (error) => console.log(error),
-    });
   }
 
   onSubmit() { 
+    this.projectForm.controls['teamLeads'].enable();
+    console.log("project",this.project.teamLeads);
     this.project=this.projectForm.value;
+    console.log("value",this.projectForm.value);
     const link:string = "/main/"+this.routeid+"/projects";
     
     console.log(this.routeid);
@@ -137,6 +187,7 @@ export class AddProjectsComponent {
           error: (error) => this.openSnackBar("Project edit failed"),
         });
       } else {
+        // this.project.teamLeads.push(this.userid);
         this.service.postProject(this.project).subscribe({
           next: (response) =>
           { 

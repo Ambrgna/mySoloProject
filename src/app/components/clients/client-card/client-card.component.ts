@@ -26,7 +26,7 @@ export class ClientCardComponent implements OnInit {
   }
   ngOnInit(): void {
     if(this.client.name!==undefined){
-      this.logo=this.client.name.split("")[0];
+      this.logo=this.client.name.toUpperCase().split("")[0];
     }    
     if(this.client.userId==this.userid){
       this.isOwner=true;

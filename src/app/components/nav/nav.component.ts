@@ -11,30 +11,29 @@ export class NavComponent {
   headers!: string | null;
   userid: string | null;
   loggedin: boolean | undefined;
+  leadUser: boolean=false;
   // iSOwner:boolean=false;
   
   constructor(private service: UsersapiService, private router: Router){
     this.headers = localStorage.getItem("headers");
     this.userid = localStorage.getItem("userid");
-    // if(this.userid!=null){
-    //   this.service.getUserById(this.userid).subscribe({
-    //     next: (r) => {
-    //       if(r.role=="ROLE_OWNER"){
-    //         this.iSOwner =true;
-    //       }
-    //     },
-    //     error: (e) => console.log(e)
-    //   });
-    // }
+    
+    if(this.userid!=null){
+      this.service.getUserById(this.userid).subscribe({
+        next: (r) => {
+          console.log("role",r.role);
+          if(r.role=="ROLE_LEAD"){
+            this.leadUser =true;
+          }
+        },
+        error: (e) => console.log(e)
+      });
+    }
   
     if(this.headers != null){
       this.loggedin=true;
     }
   }
-  
-  // myRestaurants(){
-  //   this.router.navigate(["/main"]);
-  // }
 
   logout() {
     this.loggedin=false;
