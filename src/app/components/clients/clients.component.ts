@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Client } from 'src/app/entities/client';
+import { User } from 'src/app/entities/user';
 import { RestapiService } from 'src/app/services/restapi.service';
 
 @Component({
@@ -11,14 +12,17 @@ import { RestapiService } from 'src/app/services/restapi.service';
 export class ClientsComponent {
   clients: Client[] = [];
   userid: number;
+  user!: User;
   routeid: string | null;
 
   constructor(private service: RestapiService, private route:ActivatedRoute){
-    const uid = localStorage.getItem("userid");
+    const uid = sessionStorage.getItem("userid");
     this.userid=(uid!=null) ? parseInt(uid):-1;
     this.routeid = this.route.snapshot.paramMap.get('userid');
 
     this.getClients(this.routeid);
+
+    this.getUser(uid);
     
   }
 
@@ -45,6 +49,16 @@ export class ClientsComponent {
       },
       error: (e) => alert(e.message)
     })
+  }
+  public getUser(id:string|null): void {
+    if(id!=null){
+      this.service.getUserById(id).subscribe({
+        next: (response: User) => {
+          this.user=response;
+        },
+        error: (e) => alert(e.message)
+      })
+    }
   }
 
 }

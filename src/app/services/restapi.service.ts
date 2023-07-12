@@ -12,7 +12,7 @@ export class RestapiService {
   apiUrl: string = "http://localhost:9080";
   headers:any;
   constructor(private http: HttpClient) { 
-    this.headers = new HttpHeaders({Authorization: 'Basic '+localStorage.getItem("headers")});
+    this.headers = new HttpHeaders({Authorization: 'Basic '+sessionStorage.getItem("headers")});
     console.log("headers",this.headers);
   }  
   

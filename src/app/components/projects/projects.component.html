@@ -9,7 +9,7 @@
                 <div class="col-md-6 d-flex p-2 justify-content-center">
                     <a class="btn btn-default shadow w-75" [attr.href]="pdf">View the Signed Agreement</a>
                 </div>
-                <div *ngIf="isOwner" class="col-md-6 d-flex p-2 justify-content-center">
+                <div *ngIf="canAdd" class="col-md-6 d-flex p-2 justify-content-center">
                     <button class="btn btn-primary shadow w-75" routerLink="/main/{{routeid}}/p/add">Add Project</button>
                 </div>
             </div>
@@ -20,7 +20,7 @@
                 class="col d-flex justify-content-center p-4"
                 *ngFor="let project of projects"
                 (updateProjects)="updateProjects()"
-                [isOwner]="isOwner"
+                [isOwner]="canAdd"
                 [project]="project">
             </app-project-card>
         </div>

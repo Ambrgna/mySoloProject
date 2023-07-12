@@ -3,7 +3,8 @@
         <br>
         <div class="row">
             <div class="col">
-                <h3 class="display-6 fw-bold pb-md-4 underline"><strong>Clients</strong></h3>
+                <h3 *ngIf="routeid==null" class="display-6 fw-bold pb-md-4"><strong>All <span class="underline">Clients</span></strong></h3>
+                <h3 *ngIf="routeid!=null" class="display-6 fw-bold pb-md-4"><strong><span class="text-capitalize">{{user.username}}'s </span> <span class="underline">Clients</span></strong></h3>
             </div>
         </div>
         <div class="row gy-4 row-cols-1 row-cols-md-2 row-cols-lg-3">

@@ -39,8 +39,8 @@ export class AddClientsComponent {
     this.client=new Client();
     this.routeid = this.route.snapshot.paramMap.get('clientid');
     
-    const headers = localStorage.getItem("headers");
-    this.userid = localStorage.getItem("userid");
+    const headers = sessionStorage.getItem("headers");
+    this.userid = sessionStorage.getItem("userid");
     this.userid=parseInt(this.userid)
     
     if(headers == null){

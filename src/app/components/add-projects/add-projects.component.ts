@@ -35,7 +35,7 @@ export class AddProjectsComponent {
   projectForm!: FormGroup;
 
   constructor(private userService: UsersapiService,private service: RestapiService, public snackBar: MatSnackBar, private route: ActivatedRoute, private router: Router) {
-    const uid = localStorage.getItem("userid");
+    const uid = sessionStorage.getItem("userid");
     if(uid!=null){
       this.userid=parseInt(uid);
     }
@@ -44,7 +44,7 @@ export class AddProjectsComponent {
     
     this.routeid = this.route.snapshot.paramMap.get('clientid');
     
-    const headers = localStorage.getItem("headers");
+    const headers = sessionStorage.getItem("headers");
     
     this.getUsers();
 

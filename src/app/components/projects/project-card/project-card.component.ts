@@ -17,12 +17,13 @@ export class ProjectCardComponent implements OnInit {
   members:string[] = [];
   @Input() isOwner:boolean=false;
   canEdit:boolean=false;
+  canRemove:boolean=false;
   logo:string|undefined;
   date:number= Date.now();
   @Output("updateProjects") updateProjects: EventEmitter<any> = new EventEmitter();
 
   constructor(private service: RestapiService, private router: Router, public snackBar: MatSnackBar){
-    const uid = localStorage.getItem("userid");
+    const uid = sessionStorage.getItem("userid");
     if(uid!=null){
       this.userid=parseInt(uid);
     }
@@ -36,8 +37,8 @@ export class ProjectCardComponent implements OnInit {
     if(this.project.teamLeads!==undefined){
       this.canEdit=(this.project.teamLeads.includes(this.userid));
       console.log("canEdit",this.canEdit);
-      
     }
+    this.canRemove=(this.project.owner==this.userid);
   }
 
   getUsers(l_ids:any,m_ids:any): void {

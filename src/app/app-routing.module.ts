@@ -10,15 +10,15 @@ import { ProjectsComponent } from './components/projects/projects.component';
 import { MyProjectsComponent } from './components/projects/my-projects/my-projects.component';
 
 const routes: Routes = [
-  {path: '' , redirectTo: 'main/clients', pathMatch: 'full'},
+  {path: '' , redirectTo: 'main/all/clients', pathMatch: 'full'},
   {path: 'login', component:LoginComponent},
   {path: 'signup', component: SignupComponent},
-  {path: 'main', redirectTo: 'main/clients'},
+  {path: 'main', redirectTo: 'main/all/clients'},
   {
     path: 'main', component:MainComponent,
     children: [
       {
-        path: 'clients',
+        path: 'all/clients',
         component: ClientsComponent,
       },
       {

@@ -15,8 +15,8 @@ export class NavComponent {
   // iSOwner:boolean=false;
   
   constructor(private service: UsersapiService, private router: Router){
-    this.headers = localStorage.getItem("headers");
-    this.userid = localStorage.getItem("userid");
+    this.headers = sessionStorage.getItem("headers");
+    this.userid = sessionStorage.getItem("userid");
     
     if(this.userid!=null){
       this.service.getUserById(this.userid).subscribe({

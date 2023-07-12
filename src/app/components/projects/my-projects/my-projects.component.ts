@@ -19,7 +19,7 @@ export class MyProjectsComponent implements OnInit {
  
   constructor(private service: RestapiService, private route:ActivatedRoute,private sanitizer: DomSanitizer){
     this.routeid = this.route.snapshot.paramMap.get('clientid');
-    const uid = localStorage.getItem("userid");
+    const uid = sessionStorage.getItem("userid");
     this.getClients(uid);
     this.userid=(uid!=null) ? parseInt(uid):-1;
   }

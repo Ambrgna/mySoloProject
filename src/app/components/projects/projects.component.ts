@@ -3,6 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Client } from 'src/app/entities/client';
 import { Project } from 'src/app/entities/project';
+import { User } from 'src/app/entities/user';
 import { RestapiService } from 'src/app/services/restapi.service';
 
 @Component({
@@ -16,7 +17,7 @@ export class ProjectsComponent implements OnInit {
   client:Client=new Client();
   projects: Project[] = [];
   routeid:string|null;
-  isOwner:boolean = false;
+  canAdd:boolean = false;
   canView:boolean = false;
   userid:number;
  
@@ -24,7 +25,8 @@ export class ProjectsComponent implements OnInit {
     this.routeid = this.route.snapshot.paramMap.get('clientid');
     this.getProjects(this.routeid);
     this.getClient(this.routeid);
-    const uid = localStorage.getItem("userid");
+    const uid = sessionStorage.getItem("userid");
+    this.getUser(uid);
     this.userid=(uid!=null) ? parseInt(uid):-1;
   }
   ngOnInit(): void {} 
@@ -38,16 +40,26 @@ export class ProjectsComponent implements OnInit {
           )?true:false;
         console.log("canView",this.canView);
         this.client=response;
-        if(response.userId==this.userid){
-          this.isOwner=true;
-          console.log(this.isOwner);
-        }
         if(this.client.agreementPath!==undefined){
           console.log(this.client.agreementPath);
           this.pdf = this.sanitizer.bypassSecurityTrustResourceUrl(this.client.agreementPath);
         }
       },
     });
+  }
+  
+  public getUser(id:string|null): void {
+    if(id!=null){
+      this.service.getUserById(id).subscribe({
+        next: (response: User) => {
+          console.log(response);
+          if(response.role=="ROLE_LEAD"){
+            this.canAdd=true;
+            console.log(this.canAdd);
+          }
+        },
+      });
+    }
   }
 
   updateProjects(){

@@ -22,7 +22,7 @@ export class UsersapiService {
     const headers = this.headers;
     console.log(username);
     
-    localStorage.setItem("headers", btoa(username+":"+password));
+    sessionStorage.setItem("headers", btoa(username+":"+password));
     this.service.getHeader(this.headers);
 
     return this.http.get(authURL, {headers, responseType: 'text' as 'json'});
@@ -33,8 +33,8 @@ export class UsersapiService {
     
     const headers = this.headers;
     
-    localStorage.removeItem("userid")
-    localStorage.removeItem("headers");
+    sessionStorage.removeItem("userid")
+    sessionStorage.removeItem("headers");
     
     this.service.removeHeader();
 

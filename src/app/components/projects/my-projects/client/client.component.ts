@@ -18,7 +18,7 @@ export class ClientComponent implements OnInit {
   userid:number;
  
   constructor(private service: RestapiService){
-    const uid = localStorage.getItem("userid");
+    const uid = sessionStorage.getItem("userid");
     this.userid=(uid!=null) ? parseInt(uid):-1;
   }
   ngOnInit(): void {    
