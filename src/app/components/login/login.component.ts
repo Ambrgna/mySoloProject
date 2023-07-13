@@ -16,6 +16,8 @@ export class LoginComponent {
   private _failed: boolean = false;
 
   constructor(private service: UsersapiService, private router: Router, private formBuilder: FormBuilder){
+    
+    // Define Login FormGroup
     this._loginForm = new FormGroup({
       username: new FormControl(this.username, [
         Validators.required
@@ -41,6 +43,7 @@ export class LoginComponent {
       next: async () => {
         var userid = await this.service.userid(this._loginForm.value.username);
 
+        // Sets current user for later use
         sessionStorage.setItem("userid", userid);
 
         this.router.navigate(["/main"]);

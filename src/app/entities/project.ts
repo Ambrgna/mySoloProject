@@ -1,7 +1,6 @@
 export class Project {
     private _projectId:number|undefined;
     private _clientId:number|undefined;
-    private _owner: number|undefined;
     private _teamLeads:number[]=[];
     private _teamMembers:number[]=[];
     private _name:string|undefined;
@@ -21,12 +20,6 @@ export class Project {
     public set clientId(clientId : number|undefined) {
         this._clientId = clientId;
     }  
-    public get owner() : number|undefined {
-        return this._owner;
-    }
-    public set owner(owner : number|undefined) {
-        this._owner = owner;
-    }    
     public get teamLeads() : number[] {
         return this._teamLeads;
     }

@@ -12,6 +12,7 @@ export class UsersapiService {
 
   constructor(private http: HttpClient, private service: RestapiService) { }
 
+  // Make header for logged in user for HTTP Request
   public login(auth: any){
     const authURL:string = this.apiUrl+"authentication";
     const username = auth.username;
@@ -22,11 +23,12 @@ export class UsersapiService {
     console.log(username);
     
     sessionStorage.setItem("headers", btoa(username+":"+password));
-    this.service.getHeader(this.headers);
+    this.service.setHeader(this.headers);
 
     return this.http.get(authURL, {headers, responseType: 'text' as 'json'});
   }
 
+  // Clear header on logged out
   public logout(){
     const url:string = this.apiUrl+"logout";
     
@@ -40,6 +42,7 @@ export class UsersapiService {
     return this.http.get(url, {headers, responseType: 'text' as 'json'});
   }
 
+  // Gets Userid from Username
   public async userid(username:string):Promise<string>{
     var uid! :string;
     const usernameURL:string = this.apiUrl+"users/";
@@ -47,14 +50,15 @@ export class UsersapiService {
     uid = u.userId.toString();
     return uid;
   }
+  // Gets User from Userid
   public getUserById(id:string){
     return this.http.get<User>(this.apiUrl+"users/id/"+id, { headers: this.headers});
   }
-
+  // Gets All Users 
   public getUser(user: string){
     return this.http.get<User>(this.apiUrl+"users/"+user);
   }
-  
+  // Adds new User 
   public addUser(user:User){    
     return this.http.post(this.apiUrl+"users", user);
   }

@@ -27,7 +27,7 @@ export class AddClientsComponent {
   
   private bucketUrl: string = "https://rfsp.s3.us-east-2.amazonaws.com/";
   private editid:any;
-  private routeid:string|null;
+  // private routeid:string|null;
   private isFiles: boolean = false;
   
   private imagePath: any;
@@ -38,18 +38,21 @@ export class AddClientsComponent {
   
   constructor(public service: RestapiService, public snackBar: MatSnackBar, public route: ActivatedRoute, public router: Router) {
     this._client=new Client();
-    this.routeid = this.route.snapshot.paramMap.get('clientid');
     
+    // Gets current user headers for restful api
     const headers = sessionStorage.getItem("headers");
     this._userid = sessionStorage.getItem("userid");
     this._userid=parseInt(this._userid)
-    
+
+    // Navigates to login if user is not logged in
     if(headers == null){
       this.router.navigate(["/login"]);
     }
 
+    // Gets Users for private visibility
     this.getUsers();
 
+    // Define Client FormGroup
     this._clientForm = new FormGroup({
       name: new FormControl(this._client?.name, [Validators.required]),
       description: new FormControl(this._client?.description),
@@ -59,6 +62,7 @@ export class AddClientsComponent {
       agreementPath: new FormControl(this._client?.agreementPath, [Validators.required]),
     });
     
+    // Checks to see if client is being edited
     this.editid = this.route.snapshot.paramMap.get('clientid');
     console.log(this.editid);
     
@@ -123,8 +127,10 @@ export class AddClientsComponent {
   get agreementPath(): any { return this.clientForm.get('agreementPath');}
 
   public edit():void{
+    // Change action so it is clear to the user what is happening
     this._action = "Edit";
 
+    // Redefine Client FormGroup removing agreementPath being required
     this._clientForm = new FormGroup({
       name: new FormControl(this._client?.name, [
         Validators.required
@@ -136,7 +142,8 @@ export class AddClientsComponent {
       agreementPath: new FormControl(this._client?.agreementPath),
     });
 
-    this.service.getClientById(this.editid).subscribe({
+    // Populate form with client info from database 
+      this.service.getClientById(this.editid).subscribe({
       next: (response) => {
       if(response.userId==this._userid){
         this._hasAccess=true;
@@ -154,6 +161,7 @@ export class AddClientsComponent {
       error: (error) => console.log(error),
     });
   }
+  // Show user drop down for visibility
   public visibilityChange(value: boolean):void{
     var usersView:number[]=[];
     if(value){
@@ -166,6 +174,7 @@ export class AddClientsComponent {
     });
     console.log(this.clientForm.value.canView);
   }
+  // Prepare Image for upload
   public handleImageUpload(files:any):void{
     var path:any;
     if (files.length === 0){
@@ -173,19 +182,11 @@ export class AddClientsComponent {
     } else {
       this.isImages =true;
     }
- 
-    var mimeType = files[0].type;
-    if (mimeType.match(/image\/*/) == null) {
-      // this.message = "Only images are supported.";
-      return;
-    }
- 
-    var reader = new FileReader();
+
     this.imagePath = files[0];
     
-    reader.readAsDataURL(files[0]); 
   }
-
+  // Prepare File for upload
   public handleFileUpload(files:any):void{
     if (files.length === 0){
       return;
@@ -193,17 +194,11 @@ export class AddClientsComponent {
       this.isFiles =true;
     }
 
-    var mimeType = files[0].type;
-    if (mimeType.match(/application\/*/) == null) {
-      // this.message = "Only PDFs or DOC files are supported.";
-      return;
-    }
-
-    var reader = new FileReader();
     this.filePath = files[0];
     console.log(this.clientForm.value.agreementPath);
 
   }
+  // Upload Images and Files to Bucket and get name
   public upload(filePath:any,itemId:any,date:number,ext:string){
     const file = new FormData(); 
     var name: string;
@@ -227,16 +222,16 @@ export class AddClientsComponent {
       console.log("Uploaded "+name+" Failed."),
     });
   }
+  // Submit Form
   public onSubmit() { 
     console.log(this.clientForm.value);
     const defaultImg:string="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
     var itemId;
     const date =getDate();
-    itemId=(this.routeid!=null) ? this.routeid : getDate();
-    // itemId=getDate();
     
     this._client=this.clientForm.value;
 
+    // Upload any Image and adds name to for later post method 
     if(this.isImages){
       console.log(this.imagePath);
       this.upload(this.imagePath,itemId,date,"jpg");
@@ -244,47 +239,50 @@ export class AddClientsComponent {
       console.log(this._client);
     }
 
+    // Upload any Files and adds name to for later post method 
     if(this.isFiles){
       console.log(this.filePath);
       
       this.upload(this.filePath,itemId,date,"pdf");
       this.savedAgreementPath=this.bucketUrl+itemId+"/client.pdf";
     }
-    // this.clientForm.value.agreementPath="";
-    if(this.routeid!==null){
-      this._client.clientId = parseInt(this.routeid);
-    }
+    
+    // Prepare objects for post 
     this._client.userId=this._userid;
     this._client.agreementPath=this.savedAgreementPath;
     this._client.logoPath=this.savedlogoPath;
     console.log(this._client);
     
-      if(this.editing){ 
-        this._client.clientId=parseInt(this.editid);
-        console.log(this._client);
-        this.service.updateClient(this._client).subscribe({
-          next: (response) => {
-            this.openSnackBar("Client edit successfully");
-            this.router.navigate(["/main/"+this._userid+"/clients"]);
+    // Updates item in database if editing 
+    if(this.editing){ 
+      this._client.clientId=parseInt(this.editid);
+      console.log(this._client);
+      this.service.updateClient(this._client).subscribe({
+        next: (response) => {
+          this.openSnackBar("Client edit successfully");
+          this.router.navigate(["/main/"+this._userid+"/clients"]);
+      },
+        error: (error) => this.openSnackBar("Client edit failed"),
+      });
+    } 
+    // Adds item in database if adding 
+    else {
+      this.service.postClient(this._client).subscribe({
+        next: (response) =>
+        { 
+          console.log(response);
+          this.openSnackBar("Client posted successfully");
+          this.router.navigate(["/main/"+this._userid+"/clients"]);
         },
-          error: (error) => this.openSnackBar("Client edit failed"),
-        });
-      } else {
-        this.service.postClient(this._client).subscribe({
-          next: (response) =>
-          { 
-            console.log(response);
-            this.openSnackBar("Client posted successfully");
-            this.router.navigate(["/main/"+this._userid+"/clients"]);
-          },
-          error: (error) => {
-            console.log(error);
-            this.openSnackBar("Client posted failed");
-          },
-        });
-      }        
+        error: (error) => {
+          console.log(error);
+          this.openSnackBar("Client posted failed");
+        },
+      });
+    }        
   }
 
+  // Alert to confirm task to user 
   openSnackBar(message: string) {
     this.snackBar.open(message, "OK", {
       duration: 2000,

@@ -14,12 +14,15 @@ export class NavComponent {
   private _leadUser: boolean=false;
   
   constructor(private service: UsersapiService, private router: Router){
+    
+    // Gets current user info
     this.headers = sessionStorage.getItem("headers");
     this._userid = sessionStorage.getItem("userid");
     
     if(this._userid!=null){
       this.service.getUserById(this._userid).subscribe({
         next: (r) => {
+          // Sees if a user is logged in with ROLE_LEAD
           console.log("role",r.role);
           if(r.role=="ROLE_LEAD"){
             this._leadUser =true;
@@ -29,6 +32,7 @@ export class NavComponent {
       });
     }
   
+    // Sees if a user is logged in
     if(this.headers != null){
       this._loggedin=true;
     }
@@ -45,8 +49,10 @@ export class NavComponent {
   }
   
 
+  // Logs User out
   public logout() {
     this._loggedin=false;
+    // Logs out using UsersapiService
     this.service.logout();
     this.router.navigate(["/login"]);
   }

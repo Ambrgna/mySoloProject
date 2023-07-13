@@ -23,6 +23,7 @@ export class ProjectCardComponent implements OnInit {
   @Output("updateProjects") private updateProjects: EventEmitter<any> = new EventEmitter();
 
   constructor(private service: RestapiService, private router: Router, public snackBar: MatSnackBar){
+    // Gets current logged in user id
     const uid = sessionStorage.getItem("userid");
     if(uid!=null){
       this.userid=parseInt(uid);
@@ -58,34 +59,40 @@ export class ProjectCardComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    console.log(this._project);
+    // Make card logo
     if(this._project.name!==undefined){
       this._logo=this._project.name.toUpperCase().split("")[0];
     }    
+    // Get users that are part of this project
     this.getUsers(this._project.teamLeads,this._project.teamMembers);
     if(this._project.teamLeads!==undefined){
       this._canEdit=(this._project.teamLeads.includes(this.userid));
       console.log("canEdit",this._canEdit);
     }
-    this._canRemove=(this._project.owner==this.userid);
+    
+    this._canRemove=(this._project.teamLeads[0]==this.userid);
   }
 
   public getUsers(l_ids:any,m_ids:any): void {
+    // Find users that are leads
     for(var id of l_ids){
       id = id.toString();
       this.service.getUserById(id).subscribe({
         next: (response) => {
             if(response.username !== undefined){
+              // Add leads' username to list
               this._leads.push(response.username);
             }
         },
       });
     }
+    // Find users that are team members
     for(var id of m_ids){
       id = id.toString();
       this.service.getUserById(id).subscribe({
         next: (response) => {
             if(response.username !== undefined){
+              // Add team members' username to list
               this._members.push(response.username);
             }
         },
@@ -93,15 +100,18 @@ export class ProjectCardComponent implements OnInit {
     }
   }
 
+  // Router link for editing
   public editClient(pid : number,cid : number) {
     const link = "main/"+cid+"/"+pid+"/p/edit"
     this.router.navigate([link]);
   }
 
+  // Call Delete service
   public deleteClient(id: number): void {
     this.service.deleteClient(id);
   }
 
+  // Call Delete action
   public deleteConfirm(name : string, id : number) {
     if(confirm("Are you sure you want to delete " + name))
     {
@@ -119,6 +129,7 @@ export class ProjectCardComponent implements OnInit {
     }
   }
 
+  // Alert to confirm task to user 
   public openSnackBar(message: string) {
     this.snackBar.open(message, "OK", {
       duration: 2000,

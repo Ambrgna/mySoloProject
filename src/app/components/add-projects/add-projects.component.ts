@@ -34,43 +34,49 @@ export class AddProjectsComponent {
   private routeid:string|null;
 
   constructor(private userService: UsersapiService,private service: RestapiService, public snackBar: MatSnackBar, private route: ActivatedRoute, private router: Router) {
-    const uid = sessionStorage.getItem("userid");
-    if(uid!=null){
-      this.userid=parseInt(uid);
-    }
     this._project=new Project();    
     this._client=new Client();
     
+    // Gets current user headers for restful api
+    const headers = sessionStorage.getItem("headers");
+    this.userid = sessionStorage.getItem("userid");
+    this.userid=parseInt(this.userid)
+    
     this.routeid = this.route.snapshot.paramMap.get('clientid');
     
-    const headers = sessionStorage.getItem("headers");
-    
+    // Gets Users for leads and members dropdowns
     this.getUsers();
 
+    // Gets Client info add page so it is clear what client it being added to
     this.getClient(this.routeid);
     
+    // Navigates to login if user is not logged in
     if(headers == null){
       this.router.navigate(["/login"]);
     }
 
+    // Define Project FormGroup
     this._projectForm = new FormGroup({
       name: new FormControl(this._project?.name, [
         Validators.required
       ]),
-      _owner: new FormControl(this._project?.owner),
       teamLeads: new FormControl({value: this._project?.teamLeads, disabled: true}, [
         Validators.required
       ]),
       teamMembers: new FormControl(this._project?.teamMembers),
       description: new FormControl(this._project?.description)
     });
+
+    // Checks to see if client is being edited
     this.editid = this.route.snapshot.paramMap.get('projectid');
     console.log(this.editid);
     
     if(this.editid!==undefined&&this.editid!==null){
       this._editing =true;
       this.edit();
-    }else{
+    }
+    // Changes form is a new project is being added
+    else{
       this._isOwner=true;
       this._projectForm.controls['teamLeads'].enable();
       this._project=this._projectForm.value;
@@ -125,8 +131,7 @@ export class AddProjectsComponent {
     this._members =[];
     this.service.getUsers().subscribe({
       next: (response: User[]) => {
-        for(const user of response)
-        {
+        for(const user of response){
           if(this._isOwner){
             console.log("test");
             if(user.userId==this.userid){
@@ -150,7 +155,6 @@ export class AddProjectsComponent {
         console.log(this._members);
         if(this._isOwner&&!this._editing){          
           this._projectForm.patchValue({
-            _owner:this._owner.userId,
             teamLeads:[this._owner.userId]
           });
           console.log("value",this._projectForm.value);
@@ -161,25 +165,26 @@ export class AddProjectsComponent {
   }
 
   public edit():void{    
+    // Change action so it is clear to the user what is happening
     this._action = "Edit";
 
+    // Populate form with project info from database 
     this.service.getProjectById(this.editid).subscribe({
       next: (response) => {
-        if(response.teamLeads?.includes(this.userid)||response.owner==this.userid){
+        if(response.teamLeads?.includes(this.userid)){
           this.getUsers();
           this._hasAccess=true;
           console.log(this._hasAccess);
           console.log(response);
           this._projectForm.patchValue({
             name: response.name,
-            _owner: response.owner,
             teamLeads: response.teamLeads,
             teamMembers: response.teamMembers,
             description: response.description,
           });
           this._project=this._projectForm.value;
           console.log("teamLeads",response.teamLeads);
-          if(this._project.owner==this.userid){
+          if(response.teamLeads[0]==this.userid){
             this._isOwner=true;
             this._projectForm.controls['teamLeads'].enable();
           }
@@ -190,48 +195,52 @@ export class AddProjectsComponent {
         error: (error) => console.log(error),
       });
   }
-
+  // Submit Form
   public onSubmit() { 
+    const link:string = "/main/"+this.routeid+"/projects";
+
+    // Prepare objects for post 
     this._projectForm.controls['teamLeads'].enable();
     console.log("project",this._project.teamLeads);
     this._project=this._projectForm.value;
     console.log("value",this._projectForm.value);
-    const link:string = "/main/"+this.routeid+"/projects";
     
     console.log(this.routeid);
     if(this.routeid!==null){
       this._project.clientId = parseInt(this.routeid);
-      
     }
     
     console.log(this._project);
-      if(this._editing){ 
-        this._project.projectId=parseInt(this.editid);
-        console.log(this._project);
-        this.service.updateProject(this._project).subscribe({
-          next: (response) => {
-            this.openSnackBar("Project edit successfully");
-            this.router.navigate([link]);
+    // Updates item in database if editing 
+    if(this._editing){ 
+      this._project.projectId=parseInt(this.editid);
+      console.log(this._project);
+      this.service.updateProject(this._project).subscribe({
+        next: (response) => {
+          this.openSnackBar("Project edit successfully");
+          this.router.navigate([link]);
+      },
+        error: (error) => this.openSnackBar("Project edit failed"),
+      });
+    } 
+    // Adds item in database if adding 
+    else {
+      this.service.postProject(this._project).subscribe({
+        next: (response) =>
+        { 
+          console.log(response);
+          this.openSnackBar("Project posted successfully");
+          this.router.navigate([link]);
         },
-          error: (error) => this.openSnackBar("Project edit failed"),
-        });
-      } else {
-        // this._project.teamLeads.push(this.userid);
-        this.service.postProject(this._project).subscribe({
-          next: (response) =>
-          { 
-            console.log(response);
-            this.openSnackBar("Project posted successfully");
-            this.router.navigate([link]);
-          },
-          error: (error) => {
-            console.log(error);
-            this.openSnackBar("Project posted failed");
-          },
-        });
-      }        
+        error: (error) => {
+          console.log(error);
+          this.openSnackBar("Project posted failed");
+        },
+      });
+    }        
   }
 
+  // Alert to confirm task to user 
   public openSnackBar(message: string) {
     this.snackBar.open(message, "OK", {
       duration: 2000,

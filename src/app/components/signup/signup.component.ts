@@ -21,6 +21,7 @@ export class SignupComponent {
   private _passwordMatch: boolean = true;
 
   constructor(private service: UsersapiService, private router: Router, private formBuilder: FormBuilder,public snackBar: MatSnackBar){
+    // Define Signup FormGroup
     this._signupForm = new FormGroup({
         username: new FormControl(this.username, [Validators.required]),
         password: new FormControl(this.password, [Validators.required]),
@@ -44,6 +45,7 @@ export class SignupComponent {
   public get cp(): any { return this._signupForm.get('confirmPassword');}
   public get r(): any { return this._signupForm.get('role');}
   
+  // Checks to see if Username is Unique   
   public checkUsername(){
     console.log(this._signupForm.value.username);
     
@@ -57,10 +59,12 @@ export class SignupComponent {
     });
   }
   
+  // Checks to see if passwords match   
   public checkPassword(){
     this._passwordMatch = this._signupForm.value.password===this._signupForm.value.confirmPassword;
   }
 
+  // Add User if everything in from is correct  
   public addUser(){
     const roles = ["ROLE_LEAD","ROLE_MEMBER"];
     this._signupForm.value.role= roles[parseInt(this._signupForm.value.role)];
@@ -76,6 +80,7 @@ export class SignupComponent {
     });
   }
 
+  // Alert to confirm task to user 
   public openSnackBar(message: string) {
     this.snackBar.open(message, "OK", {
       duration: 2000,

@@ -22,12 +22,16 @@ export class ProjectsComponent implements OnInit {
   private userid:number;
  
   constructor(private service: RestapiService, private route:ActivatedRoute,private sanitizer: DomSanitizer){
-    this._routeid = this.route.snapshot.paramMap.get('clientid');
-    this.getProjects(this._routeid);
-    this.getClient(this._routeid);
+    // Gets current logged in user id
     const uid = sessionStorage.getItem("userid");
     this.getUser(uid);
     this.userid=(uid!=null) ? parseInt(uid):-1;
+    // Gets client id for page
+    this._routeid = this.route.snapshot.paramMap.get('clientid');
+    // Gets Projects from the Client
+    this.getProjects(this._routeid);
+    // Get Client info
+    this.getClient(this._routeid);
   }
 
   public get pdf() : any {
@@ -50,7 +54,14 @@ export class ProjectsComponent implements OnInit {
   }
   
   public ngOnInit(): void {} 
-  
+
+  // Refreshes Projects list
+  public updateProjects(){
+    this._projects=[];
+    this.getProjects(this._routeid);
+  }
+
+  // Get Client info to fill page
   public getClient(id:string|null): void {
     this.service.getClientById(id).subscribe({
       next: (response: Client) => {
@@ -67,7 +78,8 @@ export class ProjectsComponent implements OnInit {
       },
     });
   }
-  
+
+  // Get User info to limit actions
   public getUser(id:string|null): void {
     if(id!=null){
       this.service.getUserById(id).subscribe({
@@ -75,27 +87,22 @@ export class ProjectsComponent implements OnInit {
           console.log(response);
           if(response.role=="ROLE_LEAD"){
             this._canAdd=true;
-            console.log(this._canAdd);
           }
         },
       });
     }
   }
 
-  public updateProjects(){
-    this._projects=[];
-    this.getProjects(this._routeid);
-  }
-
+  // Get list of enabled Projects
   public getProjects(id:string|null): void {
     this.service.getProjectsByClientId(id).subscribe({
       next: (response: Project[]) => {
         console.log(response);
-        for(const item of response)
+        for(const project of response)
         {
-          if(item.disabled == false)
+          if(project.disabled == false)
           {
-            this._projects.push(item);
+            this._projects.push(project);
           }
         }
         console.log(this._projects);

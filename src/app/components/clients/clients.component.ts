@@ -16,11 +16,15 @@ export class ClientsComponent {
   private _routeid: string|null;
 
   constructor(private service: RestapiService, private route:ActivatedRoute){
+    // Gets current logged in user id
     const uid = sessionStorage.getItem("userid");
     this.userid=(uid!=null) ? parseInt(uid):-1;
+    // Gets user id for page
     this._routeid = this.route.snapshot.paramMap.get('userid');
 
+    // Gets Clients of user
     this.getClients(this._routeid);
+    // Get User info
     this.getUser(uid);
   }
   
@@ -33,12 +37,23 @@ export class ClientsComponent {
   public get routeid() : string|null {
     return this._routeid;
   }
-
+  // Refreshes Clients list
   public updateClients(){
     this._clients=[];
     this.getClients(this._routeid);
   }
-
+  // Get User info
+  public getUser(id:string|null): void {
+    if(id!=null){
+      this.service.getUserById(id).subscribe({
+        next: (response: User) => {
+          this._user=response;
+        },
+        error: (e) => alert(e.message)
+      })
+    }
+  }
+  // Gets list of enabled Clients
   public getClients(id:String|null): void {
     this.service.getClients().subscribe({
       next: (response: Client[]) => {
@@ -57,16 +72,6 @@ export class ClientsComponent {
       },
       error: (e) => alert(e.message)
     })
-  }
-  public getUser(id:string|null): void {
-    if(id!=null){
-      this.service.getUserById(id).subscribe({
-        next: (response: User) => {
-          this._user=response;
-        },
-        error: (e) => alert(e.message)
-      })
-    }
-  }
+  }    
 
 }

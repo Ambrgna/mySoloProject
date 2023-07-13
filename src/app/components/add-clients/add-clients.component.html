@@ -52,7 +52,7 @@
                                 <label class="btn btn-default shadow w-100">
                                     Logo <input type="file" hidden
                                         onchange="$('#upload-logo-info').text(this.files[0].name)"
-                                        #logo accept='image/**'
+                                        #logo accept='image/*'
                                         formControlName="logoPath"
                                         (change)="handleImageUpload(logo.files)">
                                 </label>

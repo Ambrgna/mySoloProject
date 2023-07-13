@@ -1,0 +1,17 @@
+#page-container {
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  grid-template-columns:100%;
+
+  /* fallback height */
+  min-height:100vh;
+
+  /* new small viewport height for modern browsers */
+  min-height:100svh;
+}
+/* app-footer{
+    margin: 0;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+} */
