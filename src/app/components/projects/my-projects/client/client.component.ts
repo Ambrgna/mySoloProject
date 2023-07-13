@@ -11,34 +11,48 @@ import { RestapiService } from 'src/app/services/restapi.service';
 })
 export class ClientComponent implements OnInit {
   
-  @Input() client!:Client;
-  projects: Project[] = [];
-  clientid: string="";
-  isOwner:boolean = false;
-  userid:number;
+  private _client!:Client;
+  private _projects: Project[] = [];
+  private clientid: string="";
+  private _isOwner:boolean = false;
+  private userid:number;
  
   constructor(private service: RestapiService){
     const uid = sessionStorage.getItem("userid");
     this.userid=(uid!=null) ? parseInt(uid):-1;
   }
-  ngOnInit(): void {    
-    console.log(this.client);
+  
+  public get client() : Client {
+    return this._client;
+  }
+  @Input() public set client(client : Client) {
+    this._client = client;
+  }  
+  public get projects() : Project[] {
+    return this._projects;
+  }  
+  public get isOwner() : boolean {
+    return this._isOwner;
+  }
+  
+  public ngOnInit(): void {    
+    console.log(this._client);
 
-    if(this.client.userId==this.userid){
-      this.isOwner=true;
-      console.log(this.isOwner);
+    if(this._client.userId==this.userid){
+      this._isOwner=true;
+      console.log(this._isOwner);
     }
     
-    if(this.client.clientId!==undefined){
-      this.clientid=this.client.clientId.toString();
+    if(this._client.clientId!==undefined){
+      this.clientid=this._client.clientId.toString();
       this.getProjects(this.clientid);
     }
-    console.log(this.projects.length);
+    console.log(this._projects.length);
     
   } 
 
-  updateProjects(){
-    this.projects=[];
+  public updateProjects(){
+    this._projects=[];
     this.getProjects(this.clientid);
   }
 
@@ -50,10 +64,10 @@ export class ClientComponent implements OnInit {
         {
           if(project.disabled == false&&(project.teamLeads?.includes(this.userid)||project.teamMembers?.includes(this.userid)))
           {
-            this.projects.push(project);
+            this._projects.push(project);
           }
         }
-        console.log(this.projects);
+        console.log(this._projects);
       },
     });
   }

@@ -7,9 +7,8 @@ import { RestapiService } from './restapi.service';
   providedIn: 'root'
 })
 export class UsersapiService {
-  apiUrl: string = "http://localhost:9080/";
-  headers:any;
-  user?:User;
+  private apiUrl: string = "http://localhost:9080/";
+  private headers:any;
 
   constructor(private http: HttpClient, private service: RestapiService) { }
 

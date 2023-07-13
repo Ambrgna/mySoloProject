@@ -10,25 +10,33 @@ import { RestapiService } from 'src/app/services/restapi.service';
   styleUrls: ['./clients.component.css']
 })
 export class ClientsComponent {
-  clients: Client[] = [];
-  userid: number;
-  user!: User;
-  routeid: string | null;
+  private _clients: Client[] = [];
+  private userid: number;
+  private _user!: User;
+  private _routeid: string|null;
 
   constructor(private service: RestapiService, private route:ActivatedRoute){
     const uid = sessionStorage.getItem("userid");
     this.userid=(uid!=null) ? parseInt(uid):-1;
-    this.routeid = this.route.snapshot.paramMap.get('userid');
+    this._routeid = this.route.snapshot.paramMap.get('userid');
 
-    this.getClients(this.routeid);
-
+    this.getClients(this._routeid);
     this.getUser(uid);
-    
+  }
+  
+  public get clients() : Client[] {
+    return this._clients;
+  }
+  public get user() : User {
+    return this._user;
+  }  
+  public get routeid() : string|null {
+    return this._routeid;
   }
 
-  updateClients(){
-    this.clients=[];
-    this.getClients(this.routeid);
+  public updateClients(){
+    this._clients=[];
+    this.getClients(this._routeid);
   }
 
   public getClients(id:String|null): void {
@@ -37,13 +45,13 @@ export class ClientsComponent {
         for(const client of response){
           var shown=true;
 
-          if(this.routeid!=null){
-            const uid = parseInt(this.routeid);
+          if(this._routeid!=null){
+            const uid = parseInt(this._routeid);
             shown = client.userId==uid;
           }
           
           if(client.disabled == false&&shown&&(client.visibility==true||client.canView?.includes(this.userid))){
-            this.clients.push(client)
+            this._clients.push(client)
           }
         }
       },
@@ -54,7 +62,7 @@ export class ClientsComponent {
     if(id!=null){
       this.service.getUserById(id).subscribe({
         next: (response: User) => {
-          this.user=response;
+          this._user=response;
         },
         error: (e) => alert(e.message)
       })

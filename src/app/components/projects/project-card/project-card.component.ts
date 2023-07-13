@@ -11,16 +11,16 @@ import { RestapiService } from 'src/app/services/restapi.service';
   styleUrls: ['./project-card.component.css']
 })
 export class ProjectCardComponent implements OnInit {
-  @Input() project!: Project;
-  userid!: number;
-  leads:string[] = [];
-  members:string[] = [];
-  @Input() isOwner:boolean=false;
-  canEdit:boolean=false;
-  canRemove:boolean=false;
-  logo:string|undefined;
-  date:number= Date.now();
-  @Output("updateProjects") updateProjects: EventEmitter<any> = new EventEmitter();
+  private _project!: Project;
+  private userid!: number;
+  private _leads:string[] = [];
+  private _members:string[] = [];
+  private _isOwner:boolean=false;
+  private _canEdit:boolean=false;
+  private _canRemove:boolean=false;
+  private _logo:string|undefined;
+  private date:number= Date.now();
+  @Output("updateProjects") private updateProjects: EventEmitter<any> = new EventEmitter();
 
   constructor(private service: RestapiService, private router: Router, public snackBar: MatSnackBar){
     const uid = sessionStorage.getItem("userid");
@@ -28,26 +28,55 @@ export class ProjectCardComponent implements OnInit {
       this.userid=parseInt(uid);
     }
   }
-  ngOnInit(): void {
-    console.log(this.project);
-    if(this.project.name!==undefined){
-      this.logo=this.project.name.toUpperCase().split("")[0];
-    }    
-    this.getUsers(this.project.teamLeads,this.project.teamMembers);
-    if(this.project.teamLeads!==undefined){
-      this.canEdit=(this.project.teamLeads.includes(this.userid));
-      console.log("canEdit",this.canEdit);
-    }
-    this.canRemove=(this.project.owner==this.userid);
+  
+  public get project() : Project {
+    return this._project;
+  }  
+  public get leads() : string[] {
+    return this._leads;
+  }  
+  public get members() : string[] {
+    return this._members;
+  }
+  @Input() public set project(project : Project) {
+    this._project = project;
+  }    
+  public get isOwner() : boolean {
+    return this._isOwner;
+  }
+  @Input() public set isOwner(isOwner : boolean) {
+    this._isOwner = isOwner;
+  }    
+  public get canEdit() : boolean {
+    return this._canEdit;
+  }  
+  public get canRemove() : boolean {
+    return this._canRemove;
+  }  
+  public get logo() : string|undefined {
+    return this._logo;
   }
 
-  getUsers(l_ids:any,m_ids:any): void {
+  public ngOnInit(): void {
+    console.log(this._project);
+    if(this._project.name!==undefined){
+      this._logo=this._project.name.toUpperCase().split("")[0];
+    }    
+    this.getUsers(this._project.teamLeads,this._project.teamMembers);
+    if(this._project.teamLeads!==undefined){
+      this._canEdit=(this._project.teamLeads.includes(this.userid));
+      console.log("canEdit",this._canEdit);
+    }
+    this._canRemove=(this._project.owner==this.userid);
+  }
+
+  public getUsers(l_ids:any,m_ids:any): void {
     for(var id of l_ids){
       id = id.toString();
       this.service.getUserById(id).subscribe({
         next: (response) => {
             if(response.username !== undefined){
-              this.leads.push(response.username);
+              this._leads.push(response.username);
             }
         },
       });
@@ -57,14 +86,14 @@ export class ProjectCardComponent implements OnInit {
       this.service.getUserById(id).subscribe({
         next: (response) => {
             if(response.username !== undefined){
-              this.members.push(response.username);
+              this._members.push(response.username);
             }
         },
       });
     }
   }
 
-  editClient(pid : number,cid : number) {
+  public editClient(pid : number,cid : number) {
     const link = "main/"+cid+"/"+pid+"/p/edit"
     this.router.navigate([link]);
   }
@@ -90,7 +119,7 @@ export class ProjectCardComponent implements OnInit {
     }
   }
 
-  openSnackBar(message: string) {
+  public openSnackBar(message: string) {
     this.snackBar.open(message, "OK", {
       duration: 2000,
       });

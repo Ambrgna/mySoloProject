@@ -11,11 +11,9 @@ import { RestapiService } from 'src/app/services/restapi.service';
   styleUrls: ['./my-projects.component.css']
 })
 export class MyProjectsComponent implements OnInit {
-  clients:Client[]=[];
-  routeid:string|null;
-  isOwner:boolean = false;
-  canView:boolean = false;
-  userid:number;
+  private _clients:Client[]=[];
+  private routeid:string|null;
+  private userid:number;
  
   constructor(private service: RestapiService, private route:ActivatedRoute,private sanitizer: DomSanitizer){
     this.routeid = this.route.snapshot.paramMap.get('clientid');
@@ -23,7 +21,12 @@ export class MyProjectsComponent implements OnInit {
     this.getClients(uid);
     this.userid=(uid!=null) ? parseInt(uid):-1;
   }
-  ngOnInit(): void {} 
+
+  public get clients() : Client[] {
+    return this._clients;
+  }  
+
+  public ngOnInit(): void {} 
   
   public getClients(id:string|null): void {
     this.service.getClients().subscribe({
@@ -37,9 +40,9 @@ export class MyProjectsComponent implements OnInit {
           }
           
           if(client.disabled == false&&shown&&(client.visibility==true||client.canView?.includes(this.userid))){
-            this.clients.push(client)
+            this._clients.push(client)
           }
-          console.log(this.clients);
+          console.log(this._clients);
           
         }
       },

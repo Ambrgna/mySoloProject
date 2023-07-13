@@ -12,36 +12,37 @@ import { RestapiService } from 'src/app/services/restapi.service';
   styleUrls: ['./add-clients.component.css']
 })
 export class AddClientsComponent {
-  bucketUrl: string = "https://rfsp.s3.us-east-2.amazonaws.com/";
+  private _client!: Client;
+  private _users: User[] = [];
 
-  client!: Client;
-  hasAccess:boolean = false;
+  private _userid!:any;
+  private _username:string|undefined = "";
 
-  editing: boolean = false;
-  editid:any;
-  userid!:any;
-  routeid:string|null;
-  action:string="Add";
-  isFiles: boolean = false;
-  users: User[] = [];
-  username:string|undefined = "";
-
-  clientForm!: FormGroup;
+  private _hasAccess:boolean = false;
+  private _action:string="Add";
+  private _imgURL: any;
+  private _editing: boolean = false;
   
-  public imagePath: any;
-  public filePath: any;
-  imgURL: any;
-  isImages: boolean = false;
-  savedAgreementPath: string | undefined;
-  savedlogoPath: string | null | undefined;
+  private _clientForm!: FormGroup;
   
-  constructor(private service: RestapiService, public snackBar: MatSnackBar, private route: ActivatedRoute, private router: Router) {
-    this.client=new Client();
+  private bucketUrl: string = "https://rfsp.s3.us-east-2.amazonaws.com/";
+  private editid:any;
+  private routeid:string|null;
+  private isFiles: boolean = false;
+  
+  private imagePath: any;
+  private filePath: any;
+  private isImages: boolean = false;
+  private savedAgreementPath: string | undefined;
+  private savedlogoPath: string | null | undefined;
+  
+  constructor(public service: RestapiService, public snackBar: MatSnackBar, public route: ActivatedRoute, public router: Router) {
+    this._client=new Client();
     this.routeid = this.route.snapshot.paramMap.get('clientid');
     
     const headers = sessionStorage.getItem("headers");
-    this.userid = sessionStorage.getItem("userid");
-    this.userid=parseInt(this.userid)
+    this._userid = sessionStorage.getItem("userid");
+    this._userid=parseInt(this._userid)
     
     if(headers == null){
       this.router.navigate(["/login"]);
@@ -49,38 +50,67 @@ export class AddClientsComponent {
 
     this.getUsers();
 
-    this.clientForm = new FormGroup({
-      name: new FormControl(this.client?.name, [Validators.required]),
-      description: new FormControl(this.client?.description),
-      visibility: new FormControl(this.client?.visibility, [Validators.required]),
-      canView: new FormControl(this.client?.canView, [Validators.required]),
-      logoPath: new FormControl(this.client?.logoPath),
-      agreementPath: new FormControl(this.client?.agreementPath, [Validators.required]),
+    this._clientForm = new FormGroup({
+      name: new FormControl(this._client?.name, [Validators.required]),
+      description: new FormControl(this._client?.description),
+      visibility: new FormControl(this._client?.visibility, [Validators.required]),
+      canView: new FormControl(this._client?.canView, [Validators.required]),
+      logoPath: new FormControl(this._client?.logoPath),
+      agreementPath: new FormControl(this._client?.agreementPath, [Validators.required]),
     });
     
     this.editid = this.route.snapshot.paramMap.get('clientid');
     console.log(this.editid);
     
     if(this.editid!==undefined&&this.editid!==null){
-      this.editing =true;
+      this._editing =true;
       this.edit();
     } else {
-      this.hasAccess=true
+      this._hasAccess=true
     }
     
   }
-  getUsers(): void {
+
+  public get client() : Client {
+    return this._client;
+  }
+  public get users() : User[] {
+    return this._users;
+  }
+  public get userid() : any {
+    return this._userid;
+  }
+  public get username() : string|undefined {
+    return this._username;
+  }
+  public get hasAccess() : boolean {
+    return this._hasAccess;
+  }
+  public get action() : string {
+    return this._action;
+  }
+  public get imgURL() : any {
+    return this._imgURL;
+  }
+  public get editing() : boolean {
+    return this._editing;
+  }
+  public get clientForm() : FormGroup {
+    return this._clientForm;
+  }
+
+  public getUsers(): void {
     this.service.getUsers().subscribe({
       next: (response: User[]) => {
         for(const user of response)
         {
-          if(user.userId!=this.userid){
-            this.users.push(user);
+          if(user.userId!=this._userid){
+            this._users.push(user);
           } else {
-            this.username=user.username;
+            this._username=user.username;
           }
         }
-        console.log(this.users);
+        console.log(this._users);
       },
     });
   }
@@ -92,25 +122,25 @@ export class AddClientsComponent {
   get logoPath(): any { return this.clientForm.get('logoPath');}
   get agreementPath(): any { return this.clientForm.get('agreementPath');}
 
-  edit():void{
-    this.action = "Edit";
+  public edit():void{
+    this._action = "Edit";
 
-    this.clientForm = new FormGroup({
-      name: new FormControl(this.client?.name, [
+    this._clientForm = new FormGroup({
+      name: new FormControl(this._client?.name, [
         Validators.required
       ]),
-      description: new FormControl(this.client?.description),
-      visibility: new FormControl(this.client?.visibility, [Validators.required]),
-      canView: new FormControl(this.client?.canView, [Validators.required]),
-      logoPath: new FormControl(this.client?.logoPath),
-      agreementPath: new FormControl(this.client?.agreementPath),
+      description: new FormControl(this._client?.description),
+      visibility: new FormControl(this._client?.visibility, [Validators.required]),
+      canView: new FormControl(this._client?.canView, [Validators.required]),
+      logoPath: new FormControl(this._client?.logoPath),
+      agreementPath: new FormControl(this._client?.agreementPath),
     });
 
     this.service.getClientById(this.editid).subscribe({
       next: (response) => {
-      if(response.userId==this.userid){
-        this.hasAccess=true;
-        this.client=response;
+      if(response.userId==this._userid){
+        this._hasAccess=true;
+        this._client=response;
         this.clientForm.patchValue({
           name: response.name,
           visibility: response.visibility,
@@ -124,27 +154,19 @@ export class AddClientsComponent {
       error: (error) => console.log(error),
     });
   }
-  visibilityChange(value: boolean):void{
+  public visibilityChange(value: boolean):void{
     var usersView:number[]=[];
     if(value){
       usersView=[-1];
-      // usersView.push(this.userid);
-      // for(const user of this.users)
-      // {
-      //   if(user.userId!==undefined){
-      //     usersView.push(user.userId);
-      //   }
-      // }
-
     }else{
-      usersView=[this.userid];
+      usersView=[this._userid];
     }
     this.clientForm.patchValue({
       canView: usersView
     });
     console.log(this.clientForm.value.canView);
   }
-  handleImageUpload(files:any):void{
+  public handleImageUpload(files:any):void{
     var path:any;
     if (files.length === 0){
       return;
@@ -164,7 +186,7 @@ export class AddClientsComponent {
     reader.readAsDataURL(files[0]); 
   }
 
-  handleFileUpload(files:any):void{
+  public handleFileUpload(files:any):void{
     if (files.length === 0){
       return;
     } else {
@@ -182,7 +204,7 @@ export class AddClientsComponent {
     console.log(this.clientForm.value.agreementPath);
 
   }
-  upload(filePath:any,itemId:any,date:number,ext:string){
+  public upload(filePath:any,itemId:any,date:number,ext:string){
     const file = new FormData(); 
     var name: string;
     if (ext=="jpg"){
@@ -205,7 +227,7 @@ export class AddClientsComponent {
       console.log("Uploaded "+name+" Failed."),
     });
   }
-  onSubmit() { 
+  public onSubmit() { 
     console.log(this.clientForm.value);
     const defaultImg:string="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
     var itemId;
@@ -213,13 +235,13 @@ export class AddClientsComponent {
     itemId=(this.routeid!=null) ? this.routeid : getDate();
     // itemId=getDate();
     
-    this.client=this.clientForm.value;
+    this._client=this.clientForm.value;
 
     if(this.isImages){
       console.log(this.imagePath);
       this.upload(this.imagePath,itemId,date,"jpg");
       this.savedlogoPath=this.bucketUrl+itemId+"/logo.jpg";
-      console.log(this.client);
+      console.log(this._client);
     }
 
     if(this.isFiles){
@@ -230,30 +252,30 @@ export class AddClientsComponent {
     }
     // this.clientForm.value.agreementPath="";
     if(this.routeid!==null){
-      this.client.clientId = parseInt(this.routeid);
+      this._client.clientId = parseInt(this.routeid);
     }
-    this.client.userId=this.userid;
-    this.client.agreementPath=this.savedAgreementPath;
-    this.client.logoPath=this.savedlogoPath;
-    console.log(this.client);
+    this._client.userId=this._userid;
+    this._client.agreementPath=this.savedAgreementPath;
+    this._client.logoPath=this.savedlogoPath;
+    console.log(this._client);
     
       if(this.editing){ 
-        this.client.clientId=parseInt(this.editid);
-        console.log(this.client);
-        this.service.updateClient(this.client).subscribe({
+        this._client.clientId=parseInt(this.editid);
+        console.log(this._client);
+        this.service.updateClient(this._client).subscribe({
           next: (response) => {
             this.openSnackBar("Client edit successfully");
-            this.router.navigate(["/main/"+this.userid+"/clients"]);
+            this.router.navigate(["/main/"+this._userid+"/clients"]);
         },
           error: (error) => this.openSnackBar("Client edit failed"),
         });
       } else {
-        this.service.postClient(this.client).subscribe({
+        this.service.postClient(this._client).subscribe({
           next: (response) =>
           { 
             console.log(response);
             this.openSnackBar("Client posted successfully");
-            this.router.navigate(["/main/"+this.userid+"/clients"]);
+            this.router.navigate(["/main/"+this._userid+"/clients"]);
           },
           error: (error) => {
             console.log(error);

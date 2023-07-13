@@ -9,14 +9,14 @@ import { UsersapiService } from 'src/app/services/usersapi.service';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  username: string = "";
-  password: string = "";
+  private username: string = "";
+  private password: string = "";
 
-  loginForm!: FormGroup;
-  failed: boolean = false;
+  private _loginForm!: FormGroup;
+  private _failed: boolean = false;
 
   constructor(private service: UsersapiService, private router: Router, private formBuilder: FormBuilder){
-    this.loginForm = new FormGroup({
+    this._loginForm = new FormGroup({
       username: new FormControl(this.username, [
         Validators.required
       ]),
@@ -25,20 +25,27 @@ export class LoginComponent {
       ])
     });
   }
+
+  public get loginForm() : FormGroup {
+    return this._loginForm;
+  }
+  public get failed() : boolean {
+    return this._failed;
+  }
   
-  get u(): any { return this.loginForm.get('username');}
-  get p(): any { return this.loginForm.get('password');}
+  public get u(): any { return this._loginForm.get('username');}
+  public get p(): any { return this._loginForm.get('password');}
   
-  async login(){
-    this.service.login(this.loginForm.value).subscribe({
+  public async login(){
+    this.service.login(this._loginForm.value).subscribe({
       next: async () => {
-        var userid = await this.service.userid(this.loginForm.value.username);
+        var userid = await this.service.userid(this._loginForm.value.username);
 
         sessionStorage.setItem("userid", userid);
 
         this.router.navigate(["/main"]);
       },
-      error: (error) =>  this.failed = true
+      error: (error) =>  this._failed = true
     });
   }
 }

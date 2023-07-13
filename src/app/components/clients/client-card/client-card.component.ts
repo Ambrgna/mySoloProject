@@ -10,13 +10,11 @@ import { RestapiService } from 'src/app/services/restapi.service';
   styleUrls: ['./client-card.component.css']
 })
 export class ClientCardComponent implements OnInit {
-  @Input() client!: Client;
-  userid!: number;
-  isOwner:boolean=false;
-  logo:string|undefined;
-  date:number= Date.now();
-  @Output("updateClients") updateClients: EventEmitter<any> = new EventEmitter();
-
+  private _client!: Client;
+  private userid!: number;
+  private _isOwner:boolean=false;
+  private _logo:string|undefined;
+  @Output("updateClients") private updateClients: EventEmitter<any> = new EventEmitter();
 
   constructor(private service: RestapiService, private router: Router, public snackBar: MatSnackBar){
     const uid = sessionStorage.getItem("userid");
@@ -24,16 +22,30 @@ export class ClientCardComponent implements OnInit {
       this.userid=parseInt(uid);
     }
   }
-  ngOnInit(): void {
-    if(this.client.name!==undefined){
-      this.logo=this.client.name.toUpperCase().split("")[0];
+  
+  public get client() : Client {
+    return this._client;
+  }
+  @Input() public set client(client : Client) {
+    this._client = client;
+  }  
+  public get isOwner() : boolean {
+    return this._isOwner;
+  }  
+  public get logo() : string|undefined {
+    return this._logo;
+  }
+  
+  public ngOnInit(): void {
+    if(this._client.name!==undefined){
+      this._logo=this._client.name.toUpperCase().split("")[0];
     }    
-    if(this.client.userId==this.userid){
-      this.isOwner=true;
+    if(this._client.userId==this.userid){
+      this._isOwner=true;
     }
   }
 
-  editClient(id : number) {
+  public editClient(id : number) {
     const link = "main/"+id+"/c/edit"
     this.router.navigate([link]);
   }
@@ -59,7 +71,7 @@ export class ClientCardComponent implements OnInit {
     }
   }
 
-  openSnackBar(message: string) {
+  public openSnackBar(message: string) {
     this.snackBar.open(message, "OK", {
       duration: 2000,
       });

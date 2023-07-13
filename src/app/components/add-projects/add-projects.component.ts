@@ -14,33 +14,32 @@ import { UsersapiService } from 'src/app/services/usersapi.service';
   styleUrls: ['./add-projects.component.css']
 })
 export class AddProjectsComponent {
+  private _client!: Client;
+  private _leads: User[] = [];
+  private _members: User[] = [];
+  private _hasAccess:boolean = false;
 
-  client!: Client;
-  leads: User[] = [];
-  members: User[] = [];
-  hasAccess:boolean = false;
+  private _owner!:User;
 
-  owner!:User;
+  private _isOwner:boolean=false;
 
-  isOwner:boolean=false;
+  private _project: Project=new Project();
 
-  project: Project=new Project();
+  private _editing: boolean = false;
+  private _action:string="Add";
+  private _projectForm!: FormGroup;
 
-  editing: boolean = false;
-  editid:any;
-  userid!:any;
-  routeid:string|null;
-  action:string="Add";
-
-  projectForm!: FormGroup;
+  private editid:any;
+  private userid!:any;
+  private routeid:string|null;
 
   constructor(private userService: UsersapiService,private service: RestapiService, public snackBar: MatSnackBar, private route: ActivatedRoute, private router: Router) {
     const uid = sessionStorage.getItem("userid");
     if(uid!=null){
       this.userid=parseInt(uid);
     }
-    this.project=new Project();    
-    this.client=new Client();
+    this._project=new Project();    
+    this._client=new Client();
     
     this.routeid = this.route.snapshot.paramMap.get('clientid');
     
@@ -54,107 +53,137 @@ export class AddProjectsComponent {
       this.router.navigate(["/login"]);
     }
 
-    this.projectForm = new FormGroup({
-      name: new FormControl(this.project?.name, [
+    this._projectForm = new FormGroup({
+      name: new FormControl(this._project?.name, [
         Validators.required
       ]),
-      owner: new FormControl(this.project?.owner),
-      teamLeads: new FormControl({value: this.project?.teamLeads, disabled: true}, [
+      _owner: new FormControl(this._project?.owner),
+      teamLeads: new FormControl({value: this._project?.teamLeads, disabled: true}, [
         Validators.required
       ]),
-      teamMembers: new FormControl(this.project?.teamMembers),
-      description: new FormControl(this.project?.description)
+      teamMembers: new FormControl(this._project?.teamMembers),
+      description: new FormControl(this._project?.description)
     });
     this.editid = this.route.snapshot.paramMap.get('projectid');
     console.log(this.editid);
     
     if(this.editid!==undefined&&this.editid!==null){
-      this.editing =true;
+      this._editing =true;
       this.edit();
     }else{
-      this.isOwner=true;
-      this.projectForm.controls['teamLeads'].enable();
-      this.project=this.projectForm.value;
+      this._isOwner=true;
+      this._projectForm.controls['teamLeads'].enable();
+      this._project=this._projectForm.value;
     }
   }
 
+  public get client() : Client {
+    return this._client;
+  }
+  public get leads() : User[] {
+    return this._leads;
+  }
+  public get members() : User[] {
+    return this._members;
+  }
+  public get hasAccess() : boolean {
+    return this._hasAccess;
+  }
+  public get owner() : User {
+    return this._owner;
+  }
+  public get isOwner() : boolean {
+    return this._isOwner;
+  }
+  public get project() : Project {
+    return this._project;
+  }
+  public get editing() : boolean {
+    return this._editing;
+  }
+  public get action() : string {
+    return this._action;
+  }
+  public get projectForm() : FormGroup {
+    return this._projectForm;
+  }
 
-  get name(): any { return this.projectForm.get('name');}
-  get teamLeads(): any { return this.projectForm.get('teamLeads');}
-  get teamMembers(): any { return this.projectForm.get('teamMembers');}
-  get description(): any { return this.projectForm.get('description');}
+  public get name(): any { return this._projectForm.get('name');}
+  public get teamLeads(): any { return this._projectForm.get('teamLeads');}
+  public get teamMembers(): any { return this._projectForm.get('teamMembers');}
+  public get description(): any { return this._projectForm.get('description');}
   
-  getClient(routeid: string | null) {
+  public getClient(routeid: string | null) {
     this.service.getClientById(routeid).subscribe({
-      next: (response) => this.client=response,
+      next: (response) => this._client=response,
       error: (error) => console.log(error),
     });
   }
   
-  getUsers(): void {          
-    this.leads = [];
-    this.members =[];
+  public getUsers(): void {          
+    this._leads = [];
+    this._members =[];
     this.service.getUsers().subscribe({
       next: (response: User[]) => {
         for(const user of response)
         {
-          if(this.isOwner){
+          if(this._isOwner){
             console.log("test");
             if(user.userId==this.userid){
               
-              this.owner=user;
+              this._owner=user;
             }
             if(user.role == "ROLE_LEAD"&&user.userId!=this.userid){
-              this.leads.push(user);
+              this._leads.push(user);
             } else if(user.role != "ROLE_LEAD") {
-              this.members.push(user);
+              this._members.push(user);
             }
           } else {
             if(user.role == "ROLE_LEAD"){
-              this.leads.push(user);
+              this._leads.push(user);
             } else {
-              this.members.push(user);
+              this._members.push(user);
             }
           }
         }
-        console.log(this.leads);
-        console.log(this.members);
-        if(this.isOwner&&!this.editing){          
-          this.projectForm.patchValue({
-            owner:this.owner.userId,
-            teamLeads:[this.owner.userId]
+        console.log(this._leads);
+        console.log(this._members);
+        if(this._isOwner&&!this._editing){          
+          this._projectForm.patchValue({
+            _owner:this._owner.userId,
+            teamLeads:[this._owner.userId]
           });
-          console.log("value",this.projectForm.value);
+          console.log("value",this._projectForm.value);
         }
       },
     });
     
   }
 
-  edit():void{    
-    this.action = "Edit";
+  public edit():void{    
+    this._action = "Edit";
 
     this.service.getProjectById(this.editid).subscribe({
       next: (response) => {
         if(response.teamLeads?.includes(this.userid)||response.owner==this.userid){
           this.getUsers();
-          this.hasAccess=true;
-          console.log(this.hasAccess);
+          this._hasAccess=true;
+          console.log(this._hasAccess);
           console.log(response);
-          this.projectForm.patchValue({
+          this._projectForm.patchValue({
             name: response.name,
-            owner: response.owner,
+            _owner: response.owner,
             teamLeads: response.teamLeads,
             teamMembers: response.teamMembers,
             description: response.description,
           });
-          this.project=this.projectForm.value;
+          this._project=this._projectForm.value;
           console.log("teamLeads",response.teamLeads);
-          if(this.project.owner==this.userid){
-            this.isOwner=true;
-            this.projectForm.controls['teamLeads'].enable();
+          if(this._project.owner==this.userid){
+            this._isOwner=true;
+            this._projectForm.controls['teamLeads'].enable();
           }
-          console.log("isOwner",this.isOwner);
+          console.log("_isOwner",this._isOwner);
           
         } 
       },
@@ -162,24 +191,24 @@ export class AddProjectsComponent {
       });
   }
 
-  onSubmit() { 
-    this.projectForm.controls['teamLeads'].enable();
-    console.log("project",this.project.teamLeads);
-    this.project=this.projectForm.value;
-    console.log("value",this.projectForm.value);
+  public onSubmit() { 
+    this._projectForm.controls['teamLeads'].enable();
+    console.log("project",this._project.teamLeads);
+    this._project=this._projectForm.value;
+    console.log("value",this._projectForm.value);
     const link:string = "/main/"+this.routeid+"/projects";
     
     console.log(this.routeid);
     if(this.routeid!==null){
-      this.project.clientId = parseInt(this.routeid);
+      this._project.clientId = parseInt(this.routeid);
       
     }
     
-    console.log(this.project);
-      if(this.editing){ 
-        this.project.projectId=parseInt(this.editid);
-        console.log(this.project);
-        this.service.updateProject(this.project).subscribe({
+    console.log(this._project);
+      if(this._editing){ 
+        this._project.projectId=parseInt(this.editid);
+        console.log(this._project);
+        this.service.updateProject(this._project).subscribe({
           next: (response) => {
             this.openSnackBar("Project edit successfully");
             this.router.navigate([link]);
@@ -187,8 +216,8 @@ export class AddProjectsComponent {
           error: (error) => this.openSnackBar("Project edit failed"),
         });
       } else {
-        // this.project.teamLeads.push(this.userid);
-        this.service.postProject(this.project).subscribe({
+        // this._project.teamLeads.push(this.userid);
+        this.service.postProject(this._project).subscribe({
           next: (response) =>
           { 
             console.log(response);
@@ -203,7 +232,7 @@ export class AddProjectsComponent {
       }        
   }
 
-  openSnackBar(message: string) {
+  public openSnackBar(message: string) {
     this.snackBar.open(message, "OK", {
       duration: 2000,
     });

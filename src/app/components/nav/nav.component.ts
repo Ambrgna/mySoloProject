@@ -8,22 +8,21 @@ import { UsersapiService } from 'src/app/services/usersapi.service';
   styleUrls: ['./nav.component.css']
 })
 export class NavComponent {
-  headers!: string | null;
-  userid: string | null;
-  loggedin: boolean | undefined;
-  leadUser: boolean=false;
-  // iSOwner:boolean=false;
+  private headers!: string|null;
+  private _userid: string|null;
+  private _loggedin: boolean|undefined;
+  private _leadUser: boolean=false;
   
   constructor(private service: UsersapiService, private router: Router){
     this.headers = sessionStorage.getItem("headers");
-    this.userid = sessionStorage.getItem("userid");
+    this._userid = sessionStorage.getItem("userid");
     
-    if(this.userid!=null){
-      this.service.getUserById(this.userid).subscribe({
+    if(this._userid!=null){
+      this.service.getUserById(this._userid).subscribe({
         next: (r) => {
           console.log("role",r.role);
           if(r.role=="ROLE_LEAD"){
-            this.leadUser =true;
+            this._leadUser =true;
           }
         },
         error: (e) => console.log(e)
@@ -31,12 +30,23 @@ export class NavComponent {
     }
   
     if(this.headers != null){
-      this.loggedin=true;
+      this._loggedin=true;
     }
   }
+  
+  public get userid() : string|null {
+    return this._userid;
+  }
+  public get loggedin() : boolean|undefined {
+    return this._loggedin;
+  }
+  public get leadUser() : boolean {
+    return this._leadUser;
+  }
+  
 
-  logout() {
-    this.loggedin=false;
+  public logout() {
+    this._loggedin=false;
     this.service.logout();
     this.router.navigate(["/login"]);
   }

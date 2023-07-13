@@ -9,8 +9,9 @@ import { User } from '../entities/user';
   providedIn: 'root'
 })
 export class RestapiService {
-  apiUrl: string = "http://localhost:9080";
-  headers:any;
+  private apiUrl: string = "http://localhost:9080";
+  private headers:any;
+
   constructor(private http: HttpClient) { 
     this.headers = new HttpHeaders({Authorization: 'Basic '+sessionStorage.getItem("headers")});
     console.log("headers",this.headers);
@@ -26,7 +27,6 @@ export class RestapiService {
     console.log("headers",this.headers);
   }
 
-
   public getUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiUrl}/users`);
   }
@@ -41,7 +41,7 @@ export class RestapiService {
 
   public getClientsByUserId(id:string): Observable<Client[]> {
       return this.http.get<Client[]>(`${this.apiUrl}/clients/userid/${id}`)
-    }
+  }
 
   public getClientById(id:string|null): Observable<Client> {
     return this.http.get<Client>(`${this.apiUrl}/clients/${id}`)
