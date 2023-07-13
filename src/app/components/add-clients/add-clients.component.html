@@ -78,10 +78,10 @@
                             <div *ngIf="v.errors?.['required']">
                                 Visibility is required.
                             </div>
-                            <div *ngIf="canView.errors?.['required']">
-                                User is required.
+                            <div *ngIf="canView.errors?.['required']&&v==true">
+                                Users is required.
                             </div>
-                            <div *ngIf="this.clientForm.value.agreementPath==null">
+                            <div *ngIf="clientForm.value.agreementPath==null||clientForm.value.agreementPath==''">
                                 Signed Agreement is required.
                             </div>
                         </div>

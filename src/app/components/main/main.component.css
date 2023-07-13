@@ -1,6 +1,6 @@
 #page-container {
   display:grid;
-  grid-template-rows:auto 1fr auto;
+  grid-template-rows:auto 0 1fr auto;
   grid-template-columns:100%;
 
   /* fallback height */
@@ -9,9 +9,7 @@
   /* new small viewport height for modern browsers */
   min-height:100svh;
 }
-/* app-footer{
-    margin: 0;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-} */
+
+router-outlet{
+  grid-row-start: auto;
+}

@@ -19,6 +19,7 @@ export class ProjectsComponent implements OnInit {
   private _routeid:string|null;
   private _canAdd:boolean = false;
   private _canView:boolean = false;
+  private _accountUser:boolean = true;
   private userid:number;
  
   constructor(private service: RestapiService, private route:ActivatedRoute,private sanitizer: DomSanitizer){
@@ -51,6 +52,9 @@ export class ProjectsComponent implements OnInit {
   }
   public get canView() : boolean {
     return this._canView;
+  }
+  public get accountUser() : boolean {
+    return this._accountUser;
   }
   
   public ngOnInit(): void {} 
@@ -90,6 +94,10 @@ export class ProjectsComponent implements OnInit {
           }
         },
       });
+    }
+    // Limit actions if no user logged in
+    else{
+      this._accountUser = false;
     }
   }
 

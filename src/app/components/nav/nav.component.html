@@ -3,7 +3,7 @@
         <div class="collapse navbar-collapse" id="navcol-1">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item" *ngIf="leadUser"><a class="nav-link" routerLink="/main/{{userid}}/clients">My Clients</a></li>
-                <li class="nav-item"><a class="nav-link" routerLink="/main/myprojects">My Projects</a></li>
+                <li class="nav-item" *ngIf="accountUser"><a class="nav-link" routerLink="/main/myprojects">My Projects</a></li>
                 <li class="nav-item" *ngIf="leadUser"><a class="nav-link" routerLink="/main/c/add">Add Client</a></li>
             </ul>
             <ng-container *ngIf="loggedin">

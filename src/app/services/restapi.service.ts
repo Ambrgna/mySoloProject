@@ -33,7 +33,7 @@ export class RestapiService {
   }
   // Gets User from Userid
   public getUserById(id:string){
-    return this.http.get<User>(`${this.apiUrl}/users/id/${id}`, { headers: this.headers});
+    return this.http.get<User>(`${this.apiUrl}/users/id/${id}`);
   }
   // Gets All Clients 
   public getClients(): Observable<Client[]> {

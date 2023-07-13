@@ -12,6 +12,7 @@ export class NavComponent {
   private _userid: string|null;
   private _loggedin: boolean|undefined;
   private _leadUser: boolean=false;
+  private _accountUser: boolean=true;
   
   constructor(private service: UsersapiService, private router: Router){
     
@@ -30,6 +31,10 @@ export class NavComponent {
         },
         error: (e) => console.log(e)
       });
+    } 
+    // Change nav if no user logged in
+    else{
+      this._accountUser =false;
     }
   
     // Sees if a user is logged in
@@ -46,6 +51,9 @@ export class NavComponent {
   }
   public get leadUser() : boolean {
     return this._leadUser;
+  }
+  public get accountUser() : boolean {
+    return this._accountUser;
   }
   
 

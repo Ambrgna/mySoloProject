@@ -5,7 +5,7 @@
                 <h3 class="display-6 fw-bold pb-md-4">Projects for <span class="underline">{{client.name}}</span></h3>
                 <p class="w-lg-50 p-5">{{client.description}}</p>
             </div>
-            <div class="row justify-content-center">
+            <div  *ngIf="accountUser" class="row justify-content-center">
                 <div class="col-md-6 d-flex p-2 justify-content-center">
                     <a class="btn btn-default shadow w-75" [attr.href]="pdf">View the Signed Agreement</a>
                 </div>
@@ -32,7 +32,6 @@
             <div class="col-md-10 text-center"><img class="img-fluid w-100" src="assets/img/illustrations/404.svg" /></div>
             <div class="col text-center">
                 <h2 class="display-3 fw-bold mb-4">Page Not Found</h2>
-                <p class="fs-4 text-muted">Fusce adipiscing sit, torquent porta pulvinar.</p>
             </div>
         </div>
     </div>
